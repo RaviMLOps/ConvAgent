@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-core
+langchain-openai
+chromadb
+PyPDF2
+sentence-transformers
+faiss-cpu
+gradio
+openai
+dotenv
+#sqlite3
