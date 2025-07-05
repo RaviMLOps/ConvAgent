@@ -1,4 +1,4 @@
-import os
+import os, glob
 import logging
 from typing import List, Optional
 from PyPDF2 import PdfReader
@@ -34,7 +34,7 @@ class DocumentLoader:
             Exception: For other unexpected errors
         """
         logger.info(f"Loading PDF from: {file_path}")
-        
+        print(f"Loading PDF from: {file_path}")
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"PDF file not found at {file_path}")
         
@@ -76,6 +76,7 @@ class DocumentLoader:
         return [Document(page_content=chunk) for chunk in chunks]
     
     def process_pdf(self, file_path: str) -> List[Document]:
+        print("\ndocument_loader.py process_pdf\n**********************")
         """
         Process a PDF file and return document chunks.
         
@@ -88,7 +89,11 @@ class DocumentLoader:
         Raises:
             ValueError: If no text could be extracted from the PDF
         """
-        text = self.load_pdf(file_path)
+        
+        for file in glob.glob(f"{file_path}/*"):
+            print("VVVVVVVVVVVVVVVVVVVVVv\n@@@@@@@@@@@@@@@@@@@:", file)
+            text = self.load_pdf(file) 
+        
         if not text.strip():
             raise ValueError("No text content could be extracted from the PDF")
             

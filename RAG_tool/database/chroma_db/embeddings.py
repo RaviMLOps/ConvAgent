@@ -25,6 +25,7 @@ class VectorStoreManager:
             raise
     
     def create_vectorstore(self, documents: List[Document], force_recreate: bool = False) -> Optional[Chroma]:
+        
         """
         Create or load a Chroma vector store from documents.
         

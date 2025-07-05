@@ -16,6 +16,7 @@ class Config:
     
     # Base directories
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
     DATABASE_DIR = os.path.join(BASE_DIR, "database")
     
     # Database directories
@@ -23,7 +24,7 @@ class Config:
     CHROMA_DB_DIR = os.path.join(BASE_DIR, "chroma_db", "data")
     SQL_DB_DIR = os.path.join(DATABASE_DIR, "sql_db", "data")  # SQLite database files
     DOCUMENTS_DIR = os.path.join(DATABASE_DIR, "documents")  # For storing source documents
-    
+  
     # Backward compatibility
     PERSIST_DIRECTORY = CHROMA_DB_DIR  # For backward compatibility
     DOCUMENTS_DIRECTORY = DOCUMENTS_DIR  # For backward compatibility

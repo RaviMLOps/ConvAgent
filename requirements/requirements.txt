@@ -3,3 +3,10 @@ python-dotenv
 gradio
 openai
 openai-agents
+langchain-community
+langchain-openai
+langchain-core
+sentence-transformers
+langchain-huggingface
+langchain_experimental
+PyPDF2

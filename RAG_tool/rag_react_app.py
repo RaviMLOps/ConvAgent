@@ -52,7 +52,8 @@ def initialize_rag_agent() -> ReActRAGAgent:
 def create_gradio_interface(agent: ReActRAGAgent):
     """Create and return a Gradio chat interface for the RAG agent."""
     # System message to set the behavior of the assistant
-    system_msg = "You are a helpful AI assistant that answers questions based on the provided inputs. Be concise and accurate in your responses."
+    system_msg = "You are a helpful AI assistant that answers questions " \
+    "based on the provided inputs. Be concise and accurate in your responses."
     
     def add_text(history, text):
         """Add user message to chat history."""
@@ -133,7 +134,6 @@ def main():
         # Check if vector store exists
         if not os.path.exists(Config.CHROMA_DB_DIR):
             logger.error(f"ChromaDB directory does not exist: {Config.CHROMA_DB_DIR}")
-            print(f"Error: ChromaDB directory does not exist: {Config.CHROMA_DB_DIR}")
             return 1
             
         # List files in the ChromaDB directory for debugging

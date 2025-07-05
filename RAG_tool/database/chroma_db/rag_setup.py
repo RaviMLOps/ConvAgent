@@ -43,6 +43,7 @@ class RAGSetup:
             List of document chunks with metadata
         """
         try:
+            
             logger.info(f"Processing PDF: {pdf_path}")
             documents = self.document_loader.process_pdf(pdf_path)
             return documents
@@ -51,7 +52,7 @@ class RAGSetup:
             logger.error(f"Error processing PDF: {str(e)}")
             raise
     
-    def setup_vectorstore(self, documents: List[Dict[str, Any]] = None, pdf_path: str = None, 
+    def setup_vectorstore(self, documents: List[Dict[str, Any]] = None, pdf_path = Config.DOCUMENTS_DIR, 
                          force_recreate: bool = False) -> 'Chroma':
         """
         Set up the Chroma vector store with the provided documents or PDF.
@@ -65,6 +66,7 @@ class RAGSetup:
             Initialized Chroma vector store
         """
         try:
+            
             if documents is None and pdf_path is None:
                 raise ValueError("Either documents or pdf_path must be provided")
             
@@ -102,6 +104,7 @@ class RAGSetup:
         return self.vectorstore_manager.get_retriever(k=k)
 
     def load_existing_vectorstore(self) -> bool:
+        
         """
         Load an existing vector store from the persistence directory.
         
@@ -113,8 +116,9 @@ class RAGSetup:
             self.vectorstore = self.vectorstore_manager.load_vectorstore()
             
             if self.vectorstore is None:
-                logger.warning("No existing vector store found")
-                return False
+                #logger.warning("No existing vector store found")
+                self.vectorstore = self.setup_vectorstore()
+                return True
                 
             logger.info("Successfully loaded existing vector store")
             return True
