@@ -1,0 +1,32 @@
+@"
+# Microservices Architecture
+
+This project uses a microservices architecture with the following services:
+
+## Services
+1. **API Gateway** - Entry point for all client requests
+2. **Agent Service** - Handles conversation and tool routing
+3. **RAG Service** - Manages document retrieval and generation
+4. **Reservation Service** - Handles flight reservations
+
+## Setup
+
+1. Copy `.env.example` to `.env` and update the values
+2. Run `docker-compose up --build` to start all services
+3. Access the API at `http://localhost:8000`
+
+## Database
+
+The database files will be stored in the `./data` directory:
+- `./data/db` - SQLite database files
+- `./data/vectorstore` - Vector store for RAG
+
+## Environment Variables
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `DB_PATH`: Path to the SQLite database file
+- `VECTORSTORE_PATH`: Path to store vector embeddings
+- `LOG_LEVEL`: Logging level (INFO, DEBUG, etc.)
+"@ | Out-File -FilePath "README.md" -Encoding utf8
+
+Write-Host "Setup complete! Please update the .env file with your OpenAI API key and other configurations."

@@ -1,0 +1,6 @@
+# cancel_service/requirements.txt
+fastapi>=0.68.0
+uvicorn>=0.15.0
+python-dotenv>=0.19.0
+pydantic>=1.10.0
+sqlalchemy>=1.4.0
