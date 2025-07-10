@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,15 +20,18 @@ class Config:
     DATABASE_DIR = os.path.join(BASE_DIR, "database")
     
     # ChromaDB Server Configuration
-    CHROMA_SERVER_HOST = "http://18.200.248.198:8000/chroma"
-    CHROMA_SERVER_API = f"{CHROMA_SERVER_HOST}/api/v1"
-    
+    CHROMA_SERVER_HOST = "http://13.200.228.218:22"
+    CHROMA_SERVER_BASE = f"{CHROMA_SERVER_HOST}/chroma"
+    CHROMA_STATUS_ENDPOINT = f"{CHROMA_SERVER_BASE}/status"
+    CHROMA_QUERY_ENDPOINT = f"{CHROMA_SERVER_BASE}/query"
+   
     # Collection name to use in ChromaDB
     CHROMA_COLLECTION_NAME = "documents"
     
     # Database paths
     SQL_DB_DIR = os.path.join(DATABASE_DIR, "sql_db", "data")
     
+
     # Database directories
     # ChromaDB data storage - using direct path since the database was created in the root directory
     CHROMA_DB_DIR = os.path.join(BASE_DIR, "chroma_db", "data")
