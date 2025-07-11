@@ -1,0 +1,35 @@
+﻿Flight ID,From airport,To airport,Departure time,Flight duration,Arrival time,From city,To city,From airport code,To airport code,From country,To country,Departure days of week,Status,Delay
+SG479,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,6:00,2,8:00,Delhi,Mumbai,DEL ,BOM,India,India,Daily,On time,0
+SG475,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,8:00,2,10:00,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins
+SG944,Netaji Subhas Chandra Bose International Airport ,Pune International Airport ,15:15,2,17:15,Kolkata,Pune,CCU,PNQ,India,India,Daily,On time,0
+SG8913,Pune International Airport ,Rajiv Gandhi International Airport ,19:30,1.5,21:00,Pune,Hyderabad,PNQ,HYD,India,India,Daily,On time,0
+SG948,Chennai International Airport ,Indira Gandhi International Airport ,6:15,2.5,8:45,Chennai,Delhi,MAA,DEL ,India,India,Daily,On time,0
+SG914,Kempegowda International Airport ,Rajiv Gandhi International Airport ,8:30,1.5,10:00,Bengaluru,Hyderabad,BLR ,HYD,India,India,Daily,Delayed,1 hr
+SG937,Rajiv Gandhi International Airport ,Kempegowda International Airport ,17:15,1.5,18:45,Hyderabad,Bengaluru,HYD,BLR ,India,India,Daily,On time,0
+SG961,Lok Nayak Jayaprakash Airport,Indira Gandhi International Airport ,10:00,2,12:00,Patna,Delhi,PAT,DEL ,India,India,Daily,Delayed,15 mins
+SG160,Indira Gandhi International Airport ,Lok Nayak Jayaprakash Airport,15:30,2,17:30,Delhi,Patna,DEL ,PAT,India,India,Daily,Delayed,30 mins
+SG373,Pune International Airport ,Kempegowda International Airport ,8:30,2,10:30,Pune,Bengaluru,PNQ,BLR ,India,India,Daily,On time,0
+SG161,Kempegowda International Airport ,Pune International Airport ,19:45,2,21:45,Bengaluru,Pune,BLR ,PNQ,India,India,Daily,Delayed,1 hr
+SG374,Chhatrapati Shivaji Maharaj International Airport ,Chennai International Airport ,19:30,2,21:30,Mumbai,Chennai,BOM,MAA,India,India,Daily,Delayed,1 hr
+SG375,Chennai International Airport ,Chhatrapati Shivaji Maharaj International Airport ,12:00,2,14:00,Chennai,Mumbai,MAA,BOM,India,India,Daily,On time,0
+SG376,Kempegowda International Airport ,Netaji Subhas Chandra Bose International Airport ,17:00,2,19:00,Bengaluru,Kolkata,BLR ,CCU,India,India,Daily,On time,0
+AI385,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,14:30,2,16:30,Delhi,Mumbai,DEL ,BOM,India,India,Daily,Delayed,20 mins
+AI150,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,13:15,2,15:15,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins
+AI386,Chennai International Airport ,Rajiv Gandhi International Airport ,13:15,1.5,14:45,Chennai,Hyderabad,MAA,HYD,India,India,Daily,Delayed,20 mins
+AI151,Rajiv Gandhi International Airport ,Chennai International Airport ,11:00,1.5,12:30,Hyderabad,Chennai,HYD,MAA,India,India,Daily,Delayed,45 mins
+AI162,Kempegowda International Airport ,Goa International Airport ,11:30,1,12:30,Bengaluru,Goa,BLR ,GOI,India,India,Daily,On time,0
+AI163,Goa International Airport ,Kempegowda International Airport ,9:00,1,10:00,Goa,Bengaluru,GOI,BLR ,India,India,Daily,Delayed,20 mins
+6E509,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,13:45,2,15:45,Delhi,Mumbai,DEL ,BOM,India,India,Daily,Delayed,20 mins
+6E510,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,21:30,2,23:30,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins
+6E2696,Chennai International Airport ,Netaji Subhas Chandra Bose International Airport ,9:30,2,11:30,Chennai,Kolkata,MAA,CCU,India,India,Daily,Delayed,30 mins
+6E2131,Netaji Subhas Chandra Bose International Airport ,Chennai International Airport ,9:45,2,11:45,Kolkata,Chennai,CCU,MAA,India,India,Daily,On time,0
+6E2138,Pune International Airport ,Indira Gandhi International Airport ,21:15,2,23:15,Pune,Delhi,PNQ,DEL ,India,India,Daily,Delayed,30 mins
+6E2918,Indira Gandhi International Airport ,Pune International Airport ,10:00,2,12:00,Delhi,Pune,DEL ,PNQ,India,India,Daily,Delayed,15 mins
+6E2963,Kempegowda International Airport ,Cochin International Airport ,7:15,1,8:15,Bengaluru,Kochi,BLR ,COK,India,India,Daily,On time,0
+6E2964,Cochin International Airport ,Kempegowda International Airport ,21:30,1.5,23:00,Kochi,Bengaluru,COK,BLR ,India,India,Daily,On time,0
+6E2965,Netaji Subhas Chandra Bose International Airport ,Rajiv Gandhi International Airport ,19:30,1.5,21:00,Kolkata,Hyderabad,CCU,HYD,India,India,Daily,On time,0
+AK2966,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,14:30,2,16:30,Delhi,Mumbai,DEL ,BOM,India,India,Daily,On time,0
+AK2967,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,13:15,2,15:15,Mumbai,Delhi,BOM,DEL ,India,India,Daily,On time,0
+AK2968,Rajiv Gandhi International Airport ,Pune International Airport ,12:00,1.5,13:30,Hyderabad,Pune,HYD,PNQ,India,India,Daily,Delayed,20 mins
+AK200,Pune International Airport ,Rajiv Gandhi International Airport ,9:00,1.5,10:30,Pune,Hyderabad,PNQ,HYD,India,India,Daily,Delayed,30 mins
+AK186,Netaji Subhas Chandra Bose International Airport ,Lok Nayak Jayaprakash Airport,21:30,1.5,23:00,Kolkata,Patna,CCU,PAT,India,India,Daily,On time,0

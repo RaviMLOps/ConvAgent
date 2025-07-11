@@ -30,7 +30,7 @@ class Config:
     
     # Database paths
     SQL_DB_DIR = os.path.join(DATABASE_DIR, "sql_db", "data")
-    
+    FLIGHT_AVAILABILITY_DB_DIR = os.path.join(DATABASE_DIR, "flight_availability_db", "data")
 
     # Database directories
     # ChromaDB data storage - using direct path since the database was created in the root directory
