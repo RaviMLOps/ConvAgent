@@ -28,6 +28,13 @@ class Config:
     # Collection name to use in ChromaDB
     CHROMA_COLLECTION_NAME = "documents"
     
+    # Postgresql setup
+    pg_dbname = "Flight_reservation"
+    pg_user = "postgres"
+    pg_password = "mlcohort@4"
+    pg_host = "3.6.205.180"
+    pg_port = 5432
+    
     # Database paths
     SQL_DB_DIR = os.path.join(DATABASE_DIR, "sql_db", "data")
     FLIGHT_AVAILABILITY_DB_DIR = os.path.join(DATABASE_DIR, "flight_availability_db", "data")
