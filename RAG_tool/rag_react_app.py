@@ -69,6 +69,9 @@ def create_gradio_interface(agent: ReActRAGAgent):
         try:
             # Get response from the agent
             response = agent.query(user_message)
+             # Modification start : By Madhu
+            response = response.get("output", "No response generated.")
+            # modification end  : By Madhu
             history[-1] = (user_message, response)
         except Exception as e:
             logger.error(f"Error processing query: {str(e)}")
