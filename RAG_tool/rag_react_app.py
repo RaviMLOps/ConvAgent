@@ -16,7 +16,7 @@ from config import Config
 # Set up logging
 logging.basicConfig(
     level=logging.DEBUG,  # Set to DEBUG for more detailed output
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='[%(filename)s:%(lineno)d - %(funcName)s()] %(levelname)s: %(message)s',
     handlers=[
         logging.StreamHandler(),
         logging.FileHandler('rag_react_app.log')
@@ -69,9 +69,13 @@ def create_gradio_interface(agent: ReActRAGAgent):
         try:
             # Get response from the agent
             response = agent.query(user_message)
-             # Modification start : By Madhu
-            response = response.get("output", "No response generated.")
-            # modification end  : By Madhu
+            
+            # Added by Yash
+            if isinstance(response, dict):
+                response = response.get("output", "No response generated.")
+            else:
+                logger.debug(f"New type object: {type(response)}")
+  
             history[-1] = (user_message, response)
         except Exception as e:
             logger.error(f"Error processing query: {str(e)}")

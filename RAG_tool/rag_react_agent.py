@@ -158,7 +158,12 @@ class ReActRAGAgent:
         
         try:
             result = self.agent_executor.invoke({"input": question})
-            return result.get("output", "No response generated.")
+            if isinstance(result, dict):
+                return result.get("output", "No response generated.")
+            elif isinstance(result, str):
+                return result
+            else:
+                return f"New type object: {type(result)}"
         except Exception as e:
             error_msg = f"Error in query: {str(e)}"
             logger.error(error_msg)
