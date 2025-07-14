@@ -1,7 +1,15 @@
 # sql-tool/main.py
 from fastapi import FastAPI
 from pydantic import BaseModel
-from RAG_React_tool.Schedule_tool.schedule_sql_tool import get_schedule_sql_tool
+import sys
+import os
+
+# Add the project root to the Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from Schedule_tool.schedule_sql_tool import get_schedule_sql_tool
 
 app = FastAPI()
 
@@ -17,3 +25,7 @@ async def schedule_sql_tool_query(input: QueryInput):
         return {"response": response}
     except Exception as e:
         return {"error": str(e)}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8003)

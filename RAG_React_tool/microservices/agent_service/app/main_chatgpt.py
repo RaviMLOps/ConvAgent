@@ -8,6 +8,14 @@ from typing import Dict, Any
 from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.chat_models import ChatOpenAI
 from langchain import hub
+import os
+import sys
+
+# Add the project root directory to Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from config import Config
 
 app = FastAPI()
@@ -34,79 +42,39 @@ async def rag_tool_fn(input: str) -> str:
         return response.json().get("response", "[RAG Tool Error]")
 
 async def schedule_tool_fn(input: str) -> str:
-    """Handle flight schedule and availability queries"""
     try:
-        # Parse the input to extract parameters
-        params = parse_schedule_query(input)
-        
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 SCHEDULE_SERVICE_URL,
-                json=params.dict(exclude_none=True)
+                json={"question": input}
             )
-            
+
             if response.status_code != 200:
                 return f"[Schedule Service Error] {response.text}"
-                
-            data = response.json()
-            if not data.get("flights"):
-                return "No matching flights found."
-                
-            # Format the response
-            return format_flight_schedule(data["flights"])
-            
+
+            return json.dumps(response.json(), indent=2)
+
     except Exception as e:
         return f"[Schedule Tool Error] {str(e)}"
-
-def parse_schedule_query(query: str) -> Dict[str, Any]:
-    """Parse natural language query into schedule service parameters"""
-    # This is a simplified parser - in production, you might want to use NLP here
-    params = {"limit": 5}  # Default limit
-    
-    # Simple keyword matching (can be enhanced with more sophisticated NLP)
-    if "from" in query.lower() and "to" in query.lower():
-        parts = query.lower().split()
-        from_idx = parts.index("from") + 1
-        to_idx = parts.index("to")
-        params["from_city"] = " ".join(parts[from_idx:to_idx]).strip(",. ")
-        params["to_city"] = " ".join(parts[to_idx+1:]).strip(",. ")
-    
-    return params
-
-def format_flight_schedule(flights: list) -> str:
-    """Format flight schedule data into a human-readable string"""
-    if not flights:
-        return "No flights found."
-        
-    result = ["Here are the available flights:", ""]
-    
-    for i, flight in enumerate(flights, 1):
-        result.append(
-            f"{i}. Flight {flight.get('flight_id', 'N/A')}: "
-            f"{flight.get('from_airport_code', '')} → {flight.get('to_airport_code', '')}\n"
-            f"   Departure: {flight.get('departure_time', 'N/A')} | "
-            f"Arrival: {flight.get('arrival_time', 'N/A')}\n"
-            f"   Duration: {flight.get('flight_duration', 'N/A')} hours | "
-            f"Status: {flight.get('status', 'N/A')}"
-        )
-    
-    return "\n".join(result)
 
 # Tools wrapped in LangChain Tool interface
 tools = [
     Tool(
-        name="ReservationTool",
-        func=lambda x: sql_tool_fn(x),
+        name="CancelTool",
+        func=sql_tool_fn,
+        coroutine=sql_tool_fn,
         description="Useful for flight reservation queries like bookings, cancellations, status, and refunds."
     ),
     Tool(
         name="PolicyTool",
-        func=lambda x: rag_tool_fn(x),
+        func=rag_tool_fn,
+        coroutine=rag_tool_fn,
         description="Useful for airline policy questions, general queries, and information about baggage, check-in, and other policies."
     ),
     Tool(
         name="ScheduleTool",
-        func=lambda x: schedule_tool_fn(x),
+        func=schedule_tool_fn,
+        coroutine=schedule_tool_fn,
         description="""Useful for checking flight schedules, availability, and timings. 
         Example inputs: 
         - 'Show flights from Delhi to Mumbai'
@@ -128,3 +96,8 @@ async def react_agent(input: QueryInput):
         return {"answer": result.get("output")}
     except Exception as e:
         return {"error": str(e)}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
