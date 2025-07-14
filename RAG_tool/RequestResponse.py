@@ -1,23 +1,21 @@
 from  pydantic import BaseModel
+from typing import Optional
+
 
 class Response(BaseModel):
-    intent : str
-    tool_used : str
-    tool_input:str
-    tool_output:str
-    final_response : str
+    intent : Optional[str]
+    tool_used : Optional[str]
+    tool_input:Optional[str]
+    tool_output:Optional[str]
+    final_response : Optional[str]
 
-    def __init__(self, **kwargs):
-        if "intent" in kwargs:
-            self.intent = kwargs["intent"]
-        if "tool_used" in kwargs:
-            self.intent = kwargs["tool_used"]
-        if "tool_input" in kwargs:
-            self.intent = kwargs["tool_input"]
-        if "tool_output" in kwargs:
-            self.intent = kwargs["tool_output"]
-        if "final_response" in kwargs:
-            self.intent = kwargs["final_response"]
+    
+    # def __init__(self, **kwargs):
+    #     self.intent = kwargs.get("intent")
+    #     self.tool_used = kwargs.get("tool_used")
+    #     self.tool_input = kwargs.get("tool_input")
+    #     self.tool_output = kwargs.get("tool_output")
+    #     self.final_response = kwargs.get("final_response")
 
     def compare(self, other_object : "Response"):
         # write logic to compare both objects.

@@ -114,7 +114,8 @@ class ReActRAGAgent:
             agent=agent,
             tools=self.tools,
             verbose=True,
-            handle_parsing_errors=True
+            handle_parsing_errors=True,
+            return_intermediate_steps =  True
         )
 
     def initialize(self) -> bool:
@@ -158,12 +159,13 @@ class ReActRAGAgent:
         
         try:
             result = self.agent_executor.invoke({"input": question})
-            if isinstance(result, dict):
-                return result.get("output", "No response generated.")
-            elif isinstance(result, str):
-                return result
-            else:
-                return f"New type object: {type(result)}"
+            return result
+            # if isinstance(result, dict):
+            #     return result.get("output", "No response generated.")
+            # elif isinstance(result, str):
+            #     return result
+            # else:
+            #     return f"New type object: {type(result)}"
         except Exception as e:
             error_msg = f"Error in query: {str(e)}"
             logger.error(error_msg)
