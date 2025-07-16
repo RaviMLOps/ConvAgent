@@ -127,6 +127,51 @@ def create_and_insert_flight_reservation_data(conn, cursor):
     conn.commit()
     print(f"Successfully imported Flight_reservation data to {db_path}")
 
+def create_and_insert_flight_availability_data(conn, cursor):
+    """Create the Flight_availability table and import data from CSV"""
+    # Drop existing table if it exists
+    cursor.execute('''
+    DROP TABLE IF EXISTS Flight_availability
+    ''')
+    
+    # Create new table with updated schema
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS flight_availability (
+    availability_id SERIAL PRIMARY KEY,
+    flight_id VARCHAR(10) REFERENCES flight_schedule(flight_id),
+    date DATE NOT NULL,
+    available_seats INTEGER NOT NULL,
+    total_seats INTEGER NOT NULL,
+    booking_status VARCHAR(20) DEFAULT 'open',
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+    ''')
+    
+    # Import data from CSV
+    csv_path = current_dir / 'flight_availability.csv'
+    with open(csv_path, 'r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        
+        # Prepare data for insertion
+        data = [(
+                row['availability_id'],
+                row['flight_id'],
+                row['date'],
+                row['available_seats'],
+                row['total_seats'],
+                row['booking_status'],
+                row['last_updated']
+                 ) for row in reader]
+        
+        # Insert data
+        cursor.executemany('''
+        INSERT INTO Flight_availability VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', data)
+    
+    # Commit changes
+    conn.commit()
+    print(f"Successfully imported Flight_availabilioty data to {db_path}")
+    
 def check_table_exists(cursor, table_name):
     """Check if a table exists in the database"""
     cursor.execute(
