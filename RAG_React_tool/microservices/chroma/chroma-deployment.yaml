@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chroma
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      containers:
+      - name: chroma
+        image: chroma-local:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        # Mount the entire container/ folder as /app for code hot-reload
+        - name: app-code
+          mountPath: /app
+        # Mount only the documents folder as /app/data (PDF input)
+        - name: pdf-data
+          mountPath: /app/data
+      volumes:
+      # For code hot-reload
+      - name: app-code
+        hostPath:
+          path: /home/docker/langchain-k8s/chroma/container
+          type: Directory
+      # For PDF document ingestion
+      - name: pdf-data
+        hostPath:
+          path: /home/docker/langchain-k8s/chroma/container/documents
+          type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chroma-service
+spec:
+  type: NodePort
+  selector:
+    app: chroma
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080

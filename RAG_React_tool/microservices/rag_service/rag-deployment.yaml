@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-service-config
+data:
+# Model details (these are safe in ConfigMap)
+  MODEL_NAME: "gpt-4o"
+  TEMPERATURE: "0"
+  CHROMA_SERVER_HOST: "http://13.203.25.190:8000"
+  CHROMA_QUERY_ENDPOINT: "http://13.203.25.190:8000/chroma/query"
+  CHROMA_STATUS_ENDPOINT: "http://13.203.25.190:8000/chroma/status"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rag-service-secret
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "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"   # Replace with your real key or use external secret management!
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-service
+  template:
+    metadata:
+      labels:
+        app: rag-service
+    spec:
+      containers:
+      - name: rag-service
+        image: rag-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8002
+        envFrom:
+        - configMapRef:
+            name: rag-service-config
+        - secretRef:
+            name: rag-service-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-service
+spec:
+  type: NodePort
+  selector:
+    app: rag-service
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+      nodePort: 30082
