@@ -1,0 +1,35 @@
+﻿Flight_ID,Airline,From_airport,To_airport,Departure_Time,Flight_duration,Arrival_Time,From_city,To_city,From_airport_code,To_airport_code,From_country,To_country,Departure_days_of_week,Status,Delay,available_seats,total_seats,seat_availability_status,price
+SG479,Kohinoor,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,06:00,2,08:00,Delhi,Mumbai,DEL ,BOM,India,India,Daily,On time,0,154,220,open,7312
+SG475,Kohinoor,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,08:00,2,10:00,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins,154,220,open,4089
+SG944,Kohinoor,Netaji Subhas Chandra Bose International Airport ,Pune International Airport ,15:15,2,17:15,Kolkata,Pune,CCU,PNQ,India,India,Daily,On time,0,140,200,open,5781
+SG8913,Kohinoor,Pune International Airport ,Rajiv Gandhi International Airport ,19:30,1.5,21:00,Pune,Hyderabad,PNQ,HYD,India,India,Daily,On time,0,140,200,open,4644
+SG948,Kohinoor,Chennai International Airport ,Indira Gandhi International Airport ,06:15,2.5,08:45,Chennai,Delhi,MAA,DEL ,India,India,Daily,On time,0,105,150,open,8643
+SG914,Kohinoor,Kempegowda International Airport ,Rajiv Gandhi International Airport ,08:30,1.5,10:00,Bengaluru,Hyderabad,BLR ,HYD,India,India,Daily,Delayed,1 hr,151,180,open,5059
+SG937,Kohinoor,Rajiv Gandhi International Airport ,Kempegowda International Airport ,17:15,1.5,18:45,Hyderabad,Bengaluru,HYD,BLR ,India,India,Daily,On time,0,154,220,open,9470
+SG961,Kohinoor,Lok Nayak Jayaprakash Airport,Indira Gandhi International Airport ,10:00,2,12:00,Patna,Delhi,PAT,DEL ,India,India,Daily,Delayed,15 mins,154,220,open,3067
+SG160,Kohinoor,Indira Gandhi International Airport ,Lok Nayak Jayaprakash Airport,15:30,2,17:30,Delhi,Patna,DEL ,PAT,India,India,Daily,Delayed,30 mins,0,150,closed,4175
+SG373,Kohinoor,Pune International Airport ,Kempegowda International Airport ,08:30,2,10:30,Pune,Bengaluru,PNQ,BLR ,India,India,Daily,On time,0,0,180,closed,3663
+SG161,Kohinoor,Kempegowda International Airport ,Pune International Airport ,19:45,2,21:45,Bengaluru,Pune,BLR ,PNQ,India,India,Daily,Delayed,1 hr,154,220,open,5692
+SG374,Kohinoor,Chhatrapati Shivaji Maharaj International Airport ,Chennai International Airport ,19:30,2,21:30,Mumbai,Chennai,BOM,MAA,India,India,Daily,Delayed,1 hr,154,220,open,5539
+SG375,Kohinoor,Chennai International Airport ,Chhatrapati Shivaji Maharaj International Airport ,12:00,2,14:00,Chennai,Mumbai,MAA,BOM,India,India,Daily,On time,0,0,150,closed,6380
+SG376,Kohinoor,Kempegowda International Airport ,Netaji Subhas Chandra Bose International Airport ,17:00,2,19:00,Bengaluru,Kolkata,BLR ,CCU,India,India,Daily,On time,0,41,150,open,6516
+AI385,Kohinoor,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,14:30,2,16:30,Delhi,Mumbai,DEL ,BOM,India,India,Daily,Delayed,20 mins,105,150,open,5251
+AI150,Kohinoor,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,13:15,2,15:15,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins,0,200,closed,7175
+AI386,Kohinoor,Chennai International Airport ,Rajiv Gandhi International Airport ,13:15,1.5,14:45,Chennai,Hyderabad,MAA,HYD,India,India,Daily,Delayed,20 mins,105,150,open,6533
+AI151,Kohinoor,Rajiv Gandhi International Airport ,Chennai International Airport ,11:00,1.5,12:30,Hyderabad,Chennai,HYD,MAA,India,India,Daily,Delayed,45 mins,125,180,open,9162
+AI162,Kohinoor,Kempegowda International Airport ,Goa International Airport ,11:30,1,12:30,Bengaluru,Goa,BLR ,GOI,India,India,Daily,On time,0,140,200,open,8640
+AI163,Kohinoor,Goa International Airport ,Kempegowda International Airport ,09:00,1,10:00,Goa,Bengaluru,GOI,BLR ,India,India,Daily,Delayed,20 mins,0,180,closed,5146
+6E509,Kohinoor,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,13:45,2,15:45,Delhi,Mumbai,DEL ,BOM,India,India,Daily,Delayed,20 mins,157,220,open,4501
+6E510,Kohinoor,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,21:30,2,23:30,Mumbai,Delhi,BOM,DEL ,India,India,Daily,Delayed,30 mins,0,200,closed,9219
+6E2696,Kohinoor,Chennai International Airport ,Netaji Subhas Chandra Bose International Airport ,09:30,2,11:30,Chennai,Kolkata,MAA,CCU,India,India,Daily,Delayed,30 mins,105,150,open,3072
+6E2131,Kohinoor,Netaji Subhas Chandra Bose International Airport ,Chennai International Airport ,09:45,2,11:45,Kolkata,Chennai,CCU,MAA,India,India,Daily,On time,0,125,180,open,6211
+6E2138,Kohinoor,Pune International Airport ,Indira Gandhi International Airport ,21:15,2,23:15,Pune,Delhi,PNQ,DEL ,India,India,Daily,Delayed,30 mins,0,180,closed,6617
+6E2918,Kohinoor,Indira Gandhi International Airport ,Pune International Airport ,10:00,2,12:00,Delhi,Pune,DEL ,PNQ,India,India,Daily,Delayed,15 mins,110,220,open,7917
+6E2963,Kohinoor,Kempegowda International Airport ,Cochin International Airport ,07:15,1,08:15,Bengaluru,Kochi,BLR ,COK,India,India,Daily,On time,0,0,150,closed,7144
+6E2964,Kohinoor,Cochin International Airport ,Kempegowda International Airport ,21:30,1.5,23:00,Kochi,Bengaluru,COK,BLR ,India,India,Daily,On time,0,0,180,closed,4294
+6E2965,Kohinoor,Netaji Subhas Chandra Bose International Airport ,Rajiv Gandhi International Airport ,19:30,1.5,21:00,Kolkata,Hyderabad,CCU,HYD,India,India,Daily,On time,0,32,200,open,3265
+AK2966,Kohinoor,Indira Gandhi International Airport ,Chhatrapati Shivaji Maharaj International Airport ,14:30,2,16:30,Delhi,Mumbai,DEL ,BOM,India,India,Daily,On time,0,105,150,open,6352
+AK2967,Kohinoor,Chhatrapati Shivaji Maharaj International Airport ,Indira Gandhi International Airport ,13:15,2,15:15,Mumbai,Delhi,BOM,DEL ,India,India,Daily,On time,0,125,180,open,7558
+AK2968,Kohinoor,Rajiv Gandhi International Airport ,Pune International Airport ,12:00,1.5,13:30,Hyderabad,Pune,HYD,PNQ,India,India,Daily,Delayed,20 mins,140,200,open,5955
+AK200,Kohinoor,Pune International Airport ,Rajiv Gandhi International Airport ,09:00,1.5,10:30,Pune,Hyderabad,PNQ,HYD,India,India,Daily,Delayed,30 mins,0,180,closed,6358
+AK186,Kohinoor,Netaji Subhas Chandra Bose International Airport ,Lok Nayak Jayaprakash Airport,21:30,1.5,23:00,Kolkata,Patna,CCU,PAT,India,India,Daily,On time,0,111,180,open,6401
