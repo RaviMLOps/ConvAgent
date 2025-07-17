@@ -74,6 +74,10 @@ def determine_tool(query: str) -> ToolName:
     
     return ToolName.RAG
 
+@app.get("/home")
+def index():
+    return "Welcome to the API!"
+    
 @app.post("/query", response_model=AgentResponse)
 async def query(request: QueryRequest):
     """Handle incoming queries with ReAct agent logic."""
