@@ -16,7 +16,7 @@ metadata:
   name: rag-service-secret
 type: Opaque
 stringData:
-  OPENAI_API_KEY: "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"   # Replace with your real key or use external secret management!
+  OPENAI_API_KEY: ""
 ---
 apiVersion: apps/v1
 kind: Deployment
