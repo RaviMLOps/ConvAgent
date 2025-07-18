@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -11,10 +11,6 @@ COPY . .
 
 # Create necessary directories
 RUN mkdir -p /app/data
-
-# Set environment variables
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
 
 # Expose the port the app runs on
 EXPOSE 8003

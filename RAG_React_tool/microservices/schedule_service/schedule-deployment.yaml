@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schedule-config
+data:
+  DB_PATH: "/data/Flight_reservation.db"
+  ENV: "production"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: schedule-secret
+type: Opaque
+data:
+  OPENAI_API_KEY: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedule-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schedule-service
+  template:
+    metadata:
+      labels:
+        app: schedule-service
+    spec:
+      containers:
+        - name: schedule-service
+          image: schedule-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8003
+          env:
+            - name: DB_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: DB_PATH
+            - name: ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: ENV
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: schedule-secret
+                  key: OPENAI_API_KEY
+          volumeMounts:
+            - name: db-storage
+              mountPath: /data
+      volumes:
+        - name: db-storage
+          emptyDir: {}   # Replace with a PVC for persistent DB
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: schedule-service
+spec:
+  selector:
+    app: schedule-service
+  ports:
+    - protocol: TCP
+      port: 8003
+      targetPort: 8003
+  type: ClusterIP
