@@ -6,9 +6,9 @@ data:
 # Model details (these are safe in ConfigMap)
   MODEL_NAME: "gpt-4o"
   TEMPERATURE: "0"
-  CHROMA_SERVER_HOST: "http://13.203.25.190:8000"
-  CHROMA_QUERY_ENDPOINT: "http://13.203.25.190:8000/chroma/query"
-  CHROMA_STATUS_ENDPOINT: "http://13.203.25.190:8000/chroma/status"
+  CHROMA_SERVER_HOST: "http://chroma-service:8000"
+  CHROMA_QUERY_ENDPOINT: "http://chroma-service:8000/chroma/query"
+  CHROMA_STATUS_ENDPOINT: "http://chroma-service:8000/chroma/status"
 ---
 apiVersion: v1
 kind: Secret

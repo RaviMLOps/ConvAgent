@@ -1,5 +1,3 @@
-# rag-tool/main.py
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sys
@@ -12,17 +10,17 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Import RAGPipeline from your tool module
+# Now we can import from the root level modules
 try:
     from RAG_tool.rag_chain import RAGPipeline
 except ImportError as e:
-    print(f"Error importing RAGPipeline: {e}")
+    print(f"Error importing modules: {e}")
     print(f"Current sys.path: {sys.path}")
     raise
 
 app = FastAPI()
 
-# Read ChromaDB endpoints from environment (set via K8s ConfigMap)
+# ChromaDB server configuration from environment variables (ConfigMap in K8s)
 CHROMA_SERVER = os.getenv("CHROMA_SERVER_HOST", "http://localhost:8000")
 CHROMA_QUERY_ENDPOINT = os.getenv("CHROMA_QUERY_ENDPOINT", f"{CHROMA_SERVER}/chroma/query")
 CHROMA_STATUS_ENDPOINT = os.getenv("CHROMA_STATUS_ENDPOINT", f"{CHROMA_SERVER}/chroma/status")
@@ -101,7 +99,7 @@ async def rag_tool_search(input: QueryInput):
 
 if __name__ == "__main__":
     import uvicorn
-    host = "127.0.0.1"  # For local dev, change to "0.0.0.0" in production if needed
+    host = "127.0.0.1"  # Changed from 0.0.0.0 to 127.0.0.1 for local access
     port = 8002
 
     print("\n" + "="*50)
