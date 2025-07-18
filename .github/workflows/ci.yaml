@@ -24,8 +24,10 @@ jobs:
           python-version: '3.11'
 
       - name: AGENT SERVICE Build Docker image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
         run: |
-          docker build -t agent-service:latest .
+          docker build -t $DOCKER_USER/agent-service:latest .
         
 
       - name: AGENT SERVICE Log in to DockerHub
@@ -35,6 +37,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASS_TOKEN }}
 
       - name: AGENT SERVICE Push image to DockerHub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}      
         run: |
-          docker tag agent-service:latest ravikumarbgdocker/agent-service:latest
-          docker push ravikumarbgdocker/agent-service:
+          docker push $DOCKER_USER/agent-service
