@@ -24,6 +24,7 @@ app = FastAPI()
 SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8001/query")
 RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
 SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8003/query")
+BOOKING_TOOL_URL = os.getenv("BOOKING_TOOL_URL", "http://localhost:8004/chat")
 
 # ---- LangChain ReAct Agent Setup ---- #
 llm = ChatOpenAI(model_name="gpt-4", temperature=0)
@@ -57,6 +58,11 @@ async def schedule_tool_fn(input: str) -> str:
     except Exception as e:
         return f"[Schedule Tool Error] {str(e)}"
 
+async def flight_booking_fn(input: str) -> str:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(BOOKING_TOOL_URL, json={"question": input})
+        return response.json().get("response", "[Booking Tool Error]")
+    
 # Tools wrapped in LangChain Tool interface
 tools = [
     Tool(
@@ -70,6 +76,12 @@ tools = [
         func=rag_tool_fn,
         coroutine=rag_tool_fn,
         description="Useful for airline policy questions, general queries, and information about baggage, check-in, and other policies."
+    ),
+    Tool(
+        name="BookingTool",
+        func=lambda x: flight_booking_fn,
+        coroutine=flight_booking_fn,
+        description="Useful for flight bookings."
     ),
     Tool(
         name="ScheduleTool",
