@@ -8,8 +8,11 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-and-container-agent-service:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: RAG_React_tool/microservices/agent_service
 
     steps:
       - name: Checkout code
@@ -23,17 +26,15 @@ jobs:
       - name: AGENT SERVICE Build Docker image
         run: |
           docker build -t agent-service:latest .
-        working-directory: RAG_React_tool/microservices/agent_service
+        
 
       - name: AGENT SERVICE Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USER_NAME }}
           password: ${{ secrets.DOCKER_PASS_TOKEN }}
-        working-directory: RAG_React_tool/microservices/agent_service
 
       - name: AGENT SERVICE Push image to DockerHub
         run: |
           docker tag agent-service:latest ravikumarbgdocker/agent-service:latest
           docker push ravikumarbgdocker/agent-service:
-        working-directory: RAG_React_tool/microservices/agent_service
