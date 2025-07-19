@@ -1,14 +1,6 @@
 # sql-tool/main.py
 from fastapi import FastAPI
 from pydantic import BaseModel
-import sys
-import os
-
-# Add the project root to the Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
 from Schedule_tool.schedule_sql_tool import get_schedule_sql_tool
 
 app = FastAPI()
