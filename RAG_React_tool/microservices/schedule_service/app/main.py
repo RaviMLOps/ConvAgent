@@ -1,7 +1,7 @@
 # sql-tool/main.py
 from fastapi import FastAPI
 from pydantic import BaseModel
-from RAG_React_tool.Schedule_tool.schedule_sql_tool import get_schedule_sql_tool
+from Schedule_tool.schedule_sql_tool import get_schedule_sql_tool
 
 app = FastAPI()
 

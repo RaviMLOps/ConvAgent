@@ -3,16 +3,25 @@ kind: ConfigMap
 metadata:
   name: schedule-config
 data:
-  DB_PATH: "/data/Flight_reservation.db"
-  ENV: "production"
+  PG_HOST: "localhost"  # Change to your PostgreSQL host
+  PG_PORT: "5432"
+  PG_DB: "your_db"
+  PG_USER: "postgres"
+  MODEL_NAME: "gpt-4o"
+  TEMPERATURE: "0"
+  # Add more config if needed
+
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: schedule-secret
 type: Opaque
-data:
+stringData:
   OPENAI_API_KEY: ""
+  PG_PASSWORD: "mlcohort@4"
+  
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,32 +39,52 @@ spec:
     spec:
       containers:
         - name: schedule-service
-          image: schedule-service:latest
+          image: schedule-service:latest    # Use the correct local image tag
           imagePullPolicy: Never
           ports:
-            - containerPort: 8003
+            - containerPort: 8001           # Your FastAPI app port
           env:
-            - name: DB_PATH
+            - name: PG_HOST
               valueFrom:
                 configMapKeyRef:
                   name: schedule-config
-                  key: DB_PATH
-            - name: ENV
+                  key: PG_HOST
+            - name: PG_PORT
               valueFrom:
                 configMapKeyRef:
                   name: schedule-config
-                  key: ENV
+                  key: PG_PORT
+            - name: PG_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: PG_DB
+            - name: PG_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: PG_USER
+            - name: MODEL_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: MODEL_NAME
+            - name: TEMPERATURE
+              valueFrom:
+                configMapKeyRef:
+                  name: schedule-config
+                  key: TEMPERATURE
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: schedule-secret
+                  key: PG_PASSWORD
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: schedule-secret
                   key: OPENAI_API_KEY
-          volumeMounts:
-            - name: db-storage
-              mountPath: /data
-      volumes:
-        - name: db-storage
-          emptyDir: {}   # Replace with a PVC for persistent DB
+
 ---
 apiVersion: v1
 kind: Service
@@ -66,6 +95,6 @@ spec:
     app: schedule-service
   ports:
     - protocol: TCP
-      port: 8003
-      targetPort: 8003
+      port: 8001
+      targetPort: 8001
   type: ClusterIP
