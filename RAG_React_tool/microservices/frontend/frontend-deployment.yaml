@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flight-frontend-config
+data:
+  AGENT_SERVICE_URL: "http://react-agent:8004/chat"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-secret
+type: Opaque
+stringData:
+  OPENAI_API_KEY: ""
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flight-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flight-frontend
+  template:
+    metadata:
+      labels:
+        app: flight-frontend
+    spec:
+      containers:
+        - name: flight-frontend
+          image: flight-frontend:latest
+          imagePullPolicy: Never
+          env:
+            - name: AGENT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: flight-frontend-config
+                  key: AGENT_SERVICE_URL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-secret
+                  key: OPENAI_API_KEY
+          ports:
+            - containerPort: 7860
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flight-frontend
+spec:
+  selector:
+    app: flight-frontend
+  ports:
+    - protocol: TCP
+      port: 7860
+      targetPort: 7860
+  type: NodePort  # Or ClusterIP, as needed
