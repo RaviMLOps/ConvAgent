@@ -41,3 +41,102 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}      
         run: |
           docker push $DOCKER_USER/agent-service
+  build-and-container-cancel-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: RAG_React_tool/microservices/cancel_service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: CANCEL SERVICE Build Docker image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        run: |
+          docker build -t $DOCKER_USER/cancel-service:latest .
+        
+
+      - name: CANCEL SERVICE Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER_NAME }}
+          password: ${{ secrets.DOCKER_PASS_TOKEN }}
+
+      - name: CANCEL SERVICE Push image to DockerHub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}      
+        run: |
+          docker push $DOCKER_USER/cancel-service
+  build-and-container-chroma-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: RAG_React_tool/microservices/chroma
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: CHROMA SERVICE Build Docker image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        run: |
+          docker build -t $DOCKER_USER/chroma-service:latest .
+        
+
+      - name: CHROMA SERVICE Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER_NAME }}
+          password: ${{ secrets.DOCKER_PASS_TOKEN }}
+
+      - name: CHROMA SERVICE Push image to DockerHub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}      
+        run: |
+          docker push $DOCKER_USER/chroma-service
+  build-and-container-rag-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: RAG_React_tool/microservices/rag_service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: RAG SERVICE Build Docker image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        run: |
+          docker build -t $DOCKER_USER/rag-service:latest .
+        
+
+      - name: RAG SERVICE Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER_NAME }}
+          password: ${{ secrets.DOCKER_PASS_TOKEN }}
+
+      - name: RAG SERVICE Push image to DockerHub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}      
+        run: |
+          docker push $DOCKER_USER/rag-service          
