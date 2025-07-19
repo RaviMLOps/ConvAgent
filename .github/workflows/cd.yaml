@@ -3,12 +3,12 @@ name: CD - Agent Service
 
 # Only trigger, when the build workflow succeeded i.e. CI Pipeline
 on:
-  # push:
-  #   branches: [ feature/react_agent_rh ]
-  workflow_run:
-    workflows: ["CI - Agent Service"]
-    types:
-      - completed
+  push:
+    branches: [ feature/react_agent_rh ]
+  # workflow_run:
+  #   workflows: ["CI - Agent Service"]
+  #   types:
+  #     - completed
 
 jobs:
   deploy-chroma-service:
