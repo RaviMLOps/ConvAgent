@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cancel-service-config
+data:
+  PG_HOST: "172.31.17.57"
+  PG_PORT: "5432"
+  PG_DB: "Flight_reservation"
+  PG_USER: "postgres"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cancel-service-secret
+type: Opaque
+stringData:
+  PG_PASSWORD: "mlcohort@4"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cancel-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cancel-service
+  template:
+    metadata:
+      labels:
+        app: cancel-service
+    spec:
+      containers:
+      - name: cancel-service
+        image: cancel-service:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: PG_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cancel-service-config
+              key: PG_HOST
+        - name: PG_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: cancel-service-config
+              key: PG_PORT
+        - name: PG_DB
+          valueFrom:
+            configMapKeyRef:
+              name: cancel-service-config
+              key: PG_DB
+        - name: PG_USER
+          valueFrom:
+            configMapKeyRef:
+              name: cancel-service-config
+              key: PG_USER
+        - name: PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cancel-service-secret
+              key: PG_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cancel-service
+spec:
+  type: NodePort   # or ClusterIP, depending on your use-case
+  selector:
+    app: cancel-service
+  ports:
+    - protocol: TCP
+      port: 8003         # Service port (keep same as your app's EXPOSE)
+      targetPort: 8003   # Container port
+      nodePort: 30083    # Optional: only for NodePort type

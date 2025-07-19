@@ -1,11 +1,9 @@
-# reservation_service/app/main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import sqlite3
+import psycopg2
 import os
 import logging
-from datetime import datetime
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,58 +17,33 @@ class QueryRequest(BaseModel):
 class HealthCheck(BaseModel):
     status: str
 
-# Database configuration
-DB_PATH = os.getenv("DB_PATH", "/data/flight_reservation.db")
+# Database config from env
+DB_HOST = os.getenv("PG_HOST", "localhost")
+DB_PORT = int(os.getenv("PG_PORT", "5432"))
+DB_NAME = os.getenv("PG_DB", "postgres")
+DB_USER = os.getenv("PG_USER", "postgres")
+DB_PASS = os.getenv("PG_PASSWORD", "")
 
 def get_db_connection():
-    """Create a database connection."""
     try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
+        conn = psycopg2.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASS,
+        )
         return conn
-    except sqlite3.Error as e:
+    except psycopg2.Error as e:
         logger.error(f"Database connection error: {str(e)}")
         raise
 
-def init_db():
-    """Initialize the database with required tables if they don't exist."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Create Flight_reservation table if it doesn't exist
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Flight_reservation (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            PNR_Number TEXT UNIQUE NOT NULL,
-            Passenger_Name TEXT NOT NULL,
-            Flight_Number TEXT NOT NULL,
-            Departure_Date TEXT NOT NULL,
-            Booking_Status TEXT DEFAULT 'Confirmed',
-            Refund_Status TEXT DEFAULT 'N/A',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        ''')
-        
-        # Create an index on PNR_Number for faster lookups
-        cursor.execute('''
-        CREATE INDEX IF NOT EXISTS idx_pnr ON Flight_reservation (PNR_Number)
-        ''')
-        
-        conn.commit()
-        logger.info("Database initialized successfully")
-    except sqlite3.Error as e:
-        logger.error(f"Error initializing database: {str(e)}")
-        raise
-    finally:
-        if conn:
-            conn.close()
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup."""
-    init_db()
+def extract_pnr(query: str) -> str:
+    """Extract PNR from the query using regex after 'pnr' (case-insensitive)."""
+    match = re.search(r"pnr[\s:]*([A-Za-z0-9]+)", query, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return ""
 
 @app.get("/health", response_model=HealthCheck)
 async def health_check():
@@ -80,15 +53,22 @@ async def health_check():
 async def query(request: QueryRequest):
     """Handle reservation-related queries."""
     try:
-        query_lower = request.query.lower()
-        
-        if "status" in query_lower and "pnr" in query_lower:
-            # Extract PNR from query (simplified - in production, use NLP)
-            pnr = "".join([c for c in query_lower if c.isdigit() or c.isalpha()])
-            return await get_reservation(pnr.upper())
-            
+        query_text = request.query
+
+        if "status" in query_text.lower() and "pnr" in query_text.lower():
+            pnr = extract_pnr(query_text)
+            if not pnr:
+                return {"error": "PNR not found in the query."}
+            return await get_reservation(pnr)
+
+        if "cancel" in query_text.lower() and "pnr" in query_text.lower():
+            pnr = extract_pnr(query_text)
+            if not pnr:
+                return {"error": "PNR not found in the query."}
+            return await cancel_reservation(pnr)
+
         return {"result": "Please provide a valid reservation query with PNR number"}
-        
+
     except Exception as e:
         logger.error(f"Error processing reservation query: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -96,23 +76,44 @@ async def query(request: QueryRequest):
 @app.get("/reservations/{pnr}")
 async def get_reservation(pnr: str):
     """Get reservation details by PNR."""
+    conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        cursor.execute(
-            "SELECT * FROM Flight_reservation WHERE PNR_Number = ?",
-            (pnr,)
-        )
+        cursor.execute('SELECT * FROM "Flight_reservation" WHERE UPPER("PNR_Number") = %s', (pnr.upper(),))
         result = cursor.fetchone()
-        
+        colnames = [desc[0] for desc in cursor.description] if cursor.description else []
         if not result:
             return {"error": f"No reservation found for PNR: {pnr}"}
-        
-        # Convert Row to dict
-        return dict(result)
-        
-    except sqlite3.Error as e:
+        return dict(zip(colnames, result))
+    except Exception as e:
+        logger.error(f"Database error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn:
+            conn.close()
+
+@app.post("/cancel/{pnr}")
+async def cancel_reservation(pnr: str):
+    """Cancel reservation by PNR."""
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT "Booking_Status", "Refund_Status" FROM "Flight_reservation" WHERE UPPER("PNR_Number") = %s', (pnr.upper(),))
+        row = cursor.fetchone()
+        if not row:
+            return {"error": f"No reservation found for PNR: {pnr}"}
+        if row[0].lower() == "cancelled":
+            return {"message": "Reservation already cancelled", "refund_status": row[1]}
+        # Update the status
+        cursor.execute(
+            'UPDATE "Flight_reservation" SET "Booking_Status" = %s, "Refund_Status" = %s WHERE UPPER("PNR_Number") = %s',
+            ("Cancelled", "Refunded", pnr.upper())
+        )
+        conn.commit()
+        return {"message": "Reservation cancelled", "pnr": pnr, "refund_status": "Refunded"}
+    except Exception as e:
         logger.error(f"Database error: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
     finally:
@@ -121,4 +122,4 @@ async def get_reservation(pnr: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run(app, host="0.0.0.0", port=8003)
