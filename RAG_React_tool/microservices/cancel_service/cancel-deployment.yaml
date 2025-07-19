@@ -16,6 +16,7 @@ metadata:
 type: Opaque
 stringData:
   PG_PASSWORD: "mlcohort@4"
+  OPENAI_API_KEY: "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"
 
 ---
 apiVersion: apps/v1
@@ -35,6 +36,7 @@ spec:
       containers:
       - name: cancel-service
         image: cancel-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8002
         env:
@@ -63,6 +65,11 @@ spec:
             secretKeyRef:
               name: cancel-service-secret
               key: PG_PASSWORD
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cancel-service-secret
+              key: OPENAI_API_KEY
 ---
 apiVersion: v1
 kind: Service
