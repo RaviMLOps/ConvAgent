@@ -16,7 +16,7 @@ metadata:
 type: Opaque
 stringData:
   PG_PASSWORD: "mlcohort@4"
-  OPENAI_API_KEY: "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"
+  OPENAI_API_KEY: ""
 
 ---
 apiVersion: apps/v1
