@@ -1,0 +1,8 @@
+PyPDF2
+fastapi
+langchain-community
+chromadb==0.4.22
+uvicorn
+sentence-transformers
+pypdf
+numpy<2.0
