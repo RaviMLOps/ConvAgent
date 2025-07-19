@@ -57,19 +57,15 @@ class SQLTool:
     def _setup_sql_chain(self):
         """Set up the SQL generation chain."""
         # Build prompt
-        template = """You are a Postgresql expert. Given an input request, return a syntactically correct SQLite query to run.
+        template = """You are a Postgresql expert. Given an input data, return a syntactically correct Postgresql query to run.
         Never query for all columns from a table. You must query only the columns needed to answer the question. 
         Wrap each column name in double quotes (") to denote them as delimited identifiers.
-        The column names in the Flight_reservation table are PNR_Number,Customer_Name,Flight_ID,Airline,From_City,To_City,
-        Departure_Time,Arrival_Time,Travel_Date,Booking_Date,Booking_Status,Refund_Status.
-        Pay attention to use only the column names you can see in the Flight_reservation table. 
+        Pay attention to use only the column names you can see in the "Flight_reservation" table. 
+        The column names in the "Flight_reservation" table are "PNR_Number","Customer_Name","Flight_ID",
+        "Airline","From_City","To_City","Departure_Time","Arrival_Time","Travel_Date","Booking_Date",
+        "Booking_Status","Refund_Status".
         Be careful not to query for columns that do not exist. Also, pay attention to which column is in which table.
         Do not return any new columns nor perform aggregation on columns unless specifically asked.
-        In case of cancellation query , first step is to confirm with user that the PNR_Number is correct and share information about cancellation policy and refund amount.this should be first response. 
-        After confirmation , second step is to update the Flight_reservation table setting Booking_Status to "Canceled" and Refund_Status to "Refunded" for the specified PNR_Number.
-        
-        The database contains flight reservation data, and the PNR_Number column is used to identify reservations.
-        Always verify the PNR_Number before making any updates.
         
         Use the following format:
         

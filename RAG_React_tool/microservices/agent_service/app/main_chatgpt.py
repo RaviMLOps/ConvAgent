@@ -27,7 +27,75 @@ SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8003/
 
 # ---- LangChain ReAct Agent Setup ---- #
 llm = ChatOpenAI(model_name="gpt-4", temperature=0)
-prompt = hub.pull("hwchase17/react")
+#prompt = hub.pull("hwchase17/react")
+
+react_prompt = PromptTemplate.from_template("""
+You are a helpful AI agent that assists users with flight reservations, policies, cancellations, and schedules.
+
+You have access to the following tools:
+{tools}
+
+Tool names: {tool_names}
+
+## Rules to Follow ##
+- You must reason through each step and decide whether to use a tool.
+- You should always use a tool if information is needed to answer the user.
+- Only return the **Final Answer** if you have all the information and don't need to use a tool.
+- NEVER combine both an Action and Final Answer in the same response.
+- NEVER make up data. Use tools to retrieve accurate results.
+- If the user asks for a **cancellation**, first:
+  1. Use `PolicyTool` to check the refund/cancellation policy.
+  2. Then, ask the user for confirmation before proceeding.
+  3. Only after confirmation, use `CancelTool` to cancel the flight.
+- Keep your responses short and informative.
+
+## Format to Use ##
+
+--- TOOL USAGE ---
+Thought: I need to use a tool to proceed.
+Action: <tool name>
+Action Input: <your input to the tool>
+
+--- FINAL ANSWER ---
+Thought: I now know the final answer.
+Final Answer: <your final answer to the user>
+
+## Example: Booking Cancellation with Confirmation ##
+
+User: Please cancel my flight booking with PNR AF1234.
+
+Thought: I need to check the cancellation policy before proceeding.
+Action: PolicyTool
+Action Input: What is the refund policy for cancellations?
+
+-- tool returns refund policy --
+
+Thought: I now know the refund policy. I should confirm with the user.
+Final Answer: Cancelling this flight will incur a 20 fee and refund will take 5–7 days. Would you like to proceed with the cancellation?
+
+User: Yes, go ahead.
+
+Thought: The user has confirmed. I will now cancel the booking.
+Action: CancelTool
+Action Input: Cancel flight with PNR AF1234.
+
+-- tool returns confirmation message --
+
+Thought: The booking has been cancelled.
+Final Answer: Your flight with PNR AF1234 has been successfully cancelled. A refund of ₹8,000 will be processed in 5–7 business days.
+
+---
+
+Begin!
+
+Question: {input}
+{agent_scratchpad}
+""")
+
+
+prompt = react_prompt
+
+
 
 async def sql_tool_fn(input: str) -> str:
     """Handle flight reservation related queries"""
