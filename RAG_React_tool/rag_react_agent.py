@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Import necessary modules
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain.agents import load_tools, AgentExecutor, create_react_agent
+from langchain_community.agent_toolkits.load_tools import load_tools
 from langchain import hub
 from langchain.tools import Tool
 from langchain_openai import ChatOpenAI
@@ -159,8 +159,15 @@ class ReActRAGAgent:
         
         try:
             result = self.agent_executor.invoke({"input": question})
+            logger.debug(f"{type(result)} and value is {result}")
             return result.get("output", "No response generated.")
         except Exception as e:
             error_msg = f"Error in query: {str(e)}"
             logger.error(error_msg)
             return error_msg
+
+if __name__ == "__main__":
+    rag = ReActRAGAgent()
+    rag.initialize()
+    rag.query("What is bagage limit?")
+

@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,18 +21,28 @@ class Config:
     DATABASE_DIR = os.path.join(BASE_DIR, "database")
     
     # ChromaDB Server Configuration
-    CHROMA_SERVER_HOST = "http://13.200.228.218:22"
-    CHROMA_SERVER_BASE = f"{CHROMA_SERVER_HOST}/chroma"
+    CHROMA_SERVER_HOST = "13.200.14.155"
+    CHROMA_SERVER_PORT = 22
+    CHROMA_SERVER_BASE = f"{CHROMA_SERVER_HOST}:{CHROMA_SERVER_PORT}/chroma"
     CHROMA_STATUS_ENDPOINT = f"{CHROMA_SERVER_BASE}/status"
     CHROMA_QUERY_ENDPOINT = f"{CHROMA_SERVER_BASE}/query"
    
     # Collection name to use in ChromaDB
     CHROMA_COLLECTION_NAME = "documents"
     
+    # Postgresql setup
+    pg_dbname = "Flight_reservation"
+    pg_dbname_2 = "Flight_availability_and_schedule"
+    pg_user = "postgres"
+    pg_password = "mlcohort@4"
+    pg_host = "13.200.14.155"
+    pg_port = 5432
+    
     # Database paths
     SQL_DB_DIR = os.path.join(DATABASE_DIR, "sql_db", "data")
     FLIGHT_AVAILABILITY_DB_DIR = os.path.join(DATABASE_DIR, "flight_availability_db", "data")
 
+    
     # Database directories
     # ChromaDB data storage - using direct path since the database was created in the root directory
     CHROMA_DB_DIR = os.path.join(BASE_DIR, "chroma_db", "data")
