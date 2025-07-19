@@ -6,13 +6,15 @@ from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import logging
-try:
-    from ..config import Config
-except ImportError:
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from config import Config
+import sys
+import os
+
+# Add the project root to the Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from config import Config
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +32,7 @@ class ScheduleSQLTool:
             temperature: Temperature for the model
         """
         # Use provided path or default to the new location in the database directory
-        self.db_path = os.path.abspath(db_path or os.path.join(Config.FLIGHT_AVAILABILITY_DB_DIR, "Flight_reservation.db"))
+        self.db_path = os.path.abspath(db_path or os.path.join(Config.FLIGHT_AVAILABILITY_DB_DIR, "flight_schedule.db"))
         logger.info(f"Using database at: {self.db_path}")
         
         self.model_name = model_name or Config.MODEL_NAME
@@ -53,18 +55,22 @@ class ScheduleSQLTool:
     def _setup_schedule_sql_chain(self):
         """Set up the SQL generation chain."""
         # Build prompt
-        template = """You are a SQLite expert. Given an input request, return a syntactically correct SQLite query to run.
-        Never query for all columns from a table. You must query only the columns needed to answer the question. 
-        Wrap each column name in double quotes (") to denote them as delimited identifiers.
-        Pay attention to use only the column names you can see in the tables below. 
-        Be careful not to query for columns that do not exist. Also, pay attention to which column is in which table.
-        Do not return any new columns nor perform aggregation on columns unless specifically asked.
-        In case of cancellation query , first step is to confirm with user that the PNR_Number is correct and share information about cancellation policy and refund amount.this should be first response. 
-        After confirmation , second step is to update the Flight_reservation table setting Booking_Status to "Cancelled" and Refund_Status to "Refunded" for the specified PNR_Number.
-        
-        The database contains flight reservation data, and the PNR_Number column is used to identify reservations.
-        Always verify the PNR_Number before making any updates.
-        
+        template = """You are a SQLite expert specialized in airline reservation systems. Your task is to generate syntactically correct SQLite queries based on the user’s natural language request.
+
+        ### General Guidelines:
+        - **Never** select all columns (`SELECT *`). Always select only the columns needed to answer the question.
+        - **Always wrap** column names in double quotes (`"column_name"`).
+        - Use **only the column names and tables explicitly provided**—do not guess.
+        - Avoid using or generating any columns that don't exist.
+        - Do **not perform aggregations (SUM, COUNT, AVG, etc.)** unless specifically asked.
+
+        ### Flight Schedule Queries:
+        If the request is related to **flight schedule**:
+        - **First**, confirm with the user whether the provided **Flight ID (flight number)** is correct.
+        - Then, respond with the **airline's schedule policy** and **refund amount**.
+        - You must **not** write or return a query for flight schedule if no valid Flight ID is provided.
+        - Do **not** attempt to extract schedules based on origin/destination or date — schedules are accessible **only via Flight ID**.
+
         Use the following format:
         
         Request: Request here
@@ -87,7 +93,13 @@ class ScheduleSQLTool:
     def execute_query(self, query: str) -> str:
         """Execute a SQL query and return the results."""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = psycopg2.connect(
+                dbname = Config.pg_dbname_2,
+                user = Config.pg_user,
+                password = Config.pg_password,
+                host = Config.pg_host,
+                port = Config.pg_port,
+                )
             cursor = conn.cursor()
             cursor.execute(query)
             
