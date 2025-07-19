@@ -1,8 +1,14 @@
-# agent_service/requirements.txt
-fastapi>=0.68.0
-uvicorn>=0.15.0
-httpx>=0.23.0
-python-dotenv>=0.19.0
-pydantic>=1.10.0
-openai>=0.28.0
-redis>=4.5.0
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY main_chatgpt.py .
+# (Optional: copy test.py only if you want to run tests inside the container)
+COPY test.py .
+
+EXPOSE 8004
+
+CMD ["uvicorn", "app.main_chatgpt:app", "--host", "0.0.0.0", "--port", "8004"]

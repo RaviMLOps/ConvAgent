@@ -7,8 +7,7 @@ import json
 from typing import Dict, Any
 from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.chat_models import ChatOpenAI
-from langchain import hub
-import os
+from langchain.prompts import PromptTemplate
 import sys
 
 # Add the project root directory to Python path
@@ -16,18 +15,17 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from config import Config
+# No Config import needed! All configuration comes from env vars.
 
 app = FastAPI()
 
-# Service URLs from config
+# Service URLs from config map/env vars
 SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8001/query")
 RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
 SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8003/query")
 
 # ---- LangChain ReAct Agent Setup ---- #
-llm = ChatOpenAI(model_name="gpt-4", temperature=0)
-#prompt = hub.pull("hwchase17/react")
+llm = ChatOpenAI(model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4"), temperature=float(os.getenv("OPENAI_TEMPERATURE", "0")), openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 react_prompt = PromptTemplate.from_template("""
 You are a helpful AI agent that assists users with flight reservations, policies, cancellations, and schedules.
@@ -92,10 +90,7 @@ Question: {input}
 {agent_scratchpad}
 """)
 
-
 prompt = react_prompt
-
-
 
 async def sql_tool_fn(input: str) -> str:
     """Handle flight reservation related queries"""
@@ -116,12 +111,9 @@ async def schedule_tool_fn(input: str) -> str:
                 SCHEDULE_SERVICE_URL,
                 json={"question": input}
             )
-
             if response.status_code != 200:
                 return f"[Schedule Service Error] {response.text}"
-
             return json.dumps(response.json(), indent=2)
-
     except Exception as e:
         return f"[Schedule Tool Error] {str(e)}"
 
@@ -164,7 +156,6 @@ async def react_agent(input: QueryInput):
         return {"answer": result.get("output")}
     except Exception as e:
         return {"error": str(e)}
-
 
 if __name__ == "__main__":
     import uvicorn
