@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Optionally copy your code for CI/prod; will be overlaid by volume in dev
 COPY container/ .

@@ -11,7 +11,7 @@ metadata:
 data:
   OPENAI_MODEL_NAME: "gpt-4o"
   OPENAI_TEMPERATURE: "0"
-  SQL_TOOL_URL: "http://schedule-service:8001/query"
+  SQL_TOOL_URL: "http://cancel-service:8003/query"
   RAG_TOOL_URL: "http://rag-service:8002/search"
   SCHEDULE_SERVICE_URL: "http://schedule-service:8001/query"
   AGENT_SERVICE_URL: "http://agent-service:8004/react-agent"
@@ -54,12 +54,24 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 8000
-        env:
-        - name: CHROMA_SERVER_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: aiops-common-config
-              key: CHROMA_SERVER_HOST
+        volumeMounts:
+        # Mount the entire container/ folder as /app for code hot-reload
+        - name: app-code
+          mountPath: /app
+        # Mount only the documents folder as /app/data (PDF input)
+        - name: pdf-data
+          mountPath: /app/data
+      volumes:
+      # For code hot-reload
+      - name: app-code
+        hostPath:
+          path: /home/docker/langchain-k8s/chroma/container
+          type: Directory
+      # For PDF document ingestion
+      - name: pdf-data
+        hostPath:
+          path: /home/docker/langchain-k8s/chroma/container/documents
+          type: Directory
 ---
 apiVersion: v1
 kind: Service
