@@ -1,3 +1,4 @@
+
 FROM python:3.10-slim
 
 WORKDIR /app
@@ -12,3 +13,4 @@ COPY test.py .
 EXPOSE 8004
 
 CMD ["uvicorn", "app.main_chatgpt:app", "--host", "0.0.0.0", "--port", "8004"]
+

@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: chroma
-        image: chroma-local:latest
-        imagePullPolicy: Never
+        image: ravikumarbgdocker/chroma-service:latest
+        # imagePullPolicy: Never
         ports:
         - containerPort: 8000
         volumeMounts:
