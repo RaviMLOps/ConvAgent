@@ -49,7 +49,8 @@ def query_chroma_server(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
 # Initialize RAG pipeline
 try:
     print("Initializing RAG pipeline...")
-    rag_chain = RAGPipeline()
+    rag_pipeline = RAGPipeline()
+    rag_chain = rag_pipeline.create_rag_chain()
     print("✓ RAG pipeline initialized successfully")
 except Exception as e:
     print(f"✗ Error initializing RAG pipeline: {str(e)}")

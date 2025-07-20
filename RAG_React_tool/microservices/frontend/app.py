@@ -4,7 +4,8 @@ import asyncio
 from typing import List, Tuple
 
 # Configuration
-AGENT_SERVICE_URL = "http://localhost:8000/react-agent"
+import os
+AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/chat")
 
 async def query_agent(question: str) -> str:
     """Send query to the agent service and return the response."""
@@ -54,6 +55,6 @@ def create_interface():
 if __name__ == "__main__":
     demo = create_interface()
     try:
-        demo.launch(server_name="0.0.0.0", server_port=7861, share=False)
+        demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
     except OSError:
         demo.launch(server_name="0.0.0.0", server_port=0, share=False)

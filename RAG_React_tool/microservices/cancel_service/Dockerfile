@@ -5,16 +5,13 @@ WORKDIR /app
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Create data directory
-RUN mkdir -p /data
+RUN pip install -r requirements.txt
 
 # Copy application code
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 8001
+EXPOSE 8003
 
 # Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "app.main_chatgpt:app", "--host", "0.0.0.0", "--port", "8003"]

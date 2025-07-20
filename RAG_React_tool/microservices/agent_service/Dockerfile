@@ -1,16 +1,16 @@
-# Use a slim Python base image
-FROM python:3.11-slim
 
-# Set the working directory inside the container
+FROM python:3.10-slim
+
 WORKDIR /app
 
-# Install ChromaDB and other necessary libraries
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy the Python script to add documents
-COPY app/main_chatgpt.py .
+COPY main_chatgpt.py .
+# (Optional: copy test.py only if you want to run tests inside the container)
+COPY test.py .
 
-EXPOSE 8000
+EXPOSE 8004
 
-CMD ["python", "main_chatgpt.py"]
+CMD ["uvicorn", "app.main_chatgpt:app", "--host", "0.0.0.0", "--port", "8004"]
+
