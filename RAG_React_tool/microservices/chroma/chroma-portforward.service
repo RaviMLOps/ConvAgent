@@ -1,0 +1,14 @@
+[Unit]
+Description=Port-forward Chroma Service from K8s to localhost:8000
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/kubectl port-forward svc/chroma-service 8000:8000 --address 0.0.0.0
+Restart=always
+RestartSec=5
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+
+[Install]
+WantedBy=multi-user.target
+

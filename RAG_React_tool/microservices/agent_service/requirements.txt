@@ -1,0 +1,8 @@
+# agent_service/requirements.txt
+fastapi>=0.68.0
+uvicorn>=0.15.0
+httpx>=0.23.0
+python-dotenv>=0.19.0
+pydantic>=1.10.0
+openai>=0.28.0
+redis>=4.5.0

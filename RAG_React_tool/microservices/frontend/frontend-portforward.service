@@ -1,0 +1,13 @@
+[Unit]
+Description=Port-forward Front end Service (7860)
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/kubectl port-forward svc/flight-frontend 7860:7860 --address 0.0.0.0
+Restart=always
+RestartSec=5
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+
+[Install]
+WantedBy=multi-user.target

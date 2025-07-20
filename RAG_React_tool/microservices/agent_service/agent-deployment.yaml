@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-service-config
+data:
+  SQL_TOOL_URL: "http://schedule-service:8001/query"
+  RAG_TOOL_URL: "http://rag-service:8002/search"
+  SCHEDULE_SERVICE_URL: "http://schedule-service:8001/query"
+  OPENAI_MODEL_NAME: "gpt-4o"
+  OPENAI_TEMPERATURE: "0"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-secret
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "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"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-service
+  template:
+    metadata:
+      labels:
+        app: agent-service
+    spec:
+      containers:
+      - name: agent-service
+        image: agent-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8004
+        env:
+        - name: SQL_TOOL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: agent-service-config
+              key: SQL_TOOL_URL
+        - name: RAG_TOOL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: agent-service-config
+              key: RAG_TOOL_URL
+        - name: SCHEDULE_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: agent-service-config
+              key: SCHEDULE_SERVICE_URL
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-secret
+              key: OPENAI_API_KEY
+        - name: OPENAI_MODEL_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: agent-service-config
+              key: OPENAI_MODEL_NAME
+        - name: OPENAI_TEMPERATURE
+          valueFrom:
+            configMapKeyRef:
+              name: agent-service-config
+              key: OPENAI_TEMPERATURE
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-service
+spec:
+  selector:
+    app: agent-service
+  ports:
+    - protocol: TCP
+      port: 8004
+      targetPort: 8004
+  type: NodePort   # or ClusterIP, adjust as needed
