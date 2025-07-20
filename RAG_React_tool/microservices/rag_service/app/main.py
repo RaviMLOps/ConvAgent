@@ -21,7 +21,7 @@ except ImportError as e:
 app = FastAPI()
 
 # ChromaDB server configuration from environment variables (ConfigMap in K8s)
-CHROMA_SERVER = os.getenv("CHROMA_SERVER_HOST", "http://localhost:8000")
+CHROMA_SERVER = os.getenv("CHROMA_SERVER_HOST", "http://localhost:8004")
 CHROMA_QUERY_ENDPOINT = os.getenv("CHROMA_QUERY_ENDPOINT", f"{CHROMA_SERVER}/chroma/query")
 CHROMA_STATUS_ENDPOINT = os.getenv("CHROMA_STATUS_ENDPOINT", f"{CHROMA_SERVER}/chroma/status")
 
@@ -83,6 +83,7 @@ async def rag_tool_search(input: QueryInput):
 
         # 3. Generate response using the RAG chain with the retrieved context
         print("Generating response with RAG...")
+
         result = rag_chain.invoke({
             "question": input.question,
             "context": context

@@ -73,11 +73,10 @@ class SQLTool:
         SQLQuery: Generated SQL Query here
     
         Request: {Request}
-        SQLQuery:
         """
-        
+        # SQLQuery
         prompt = PromptTemplate(input_variables=["Request"], template=template)
-        
+        print("inside _sql_chain_setup")
         # Create the SQL generation chain
         return (
             {"Request": RunnablePassthrough()}
@@ -97,8 +96,18 @@ class SQLTool:
                 host = Config.pg_host,
                 port = Config.pg_port,
                 )
-            cursor = conn.cursor()
-            cursor.execute(query)
+            try:
+                cursor = conn.cursor()
+            except Exception as e:
+                print("Exception: ", str(e))
+                logger.error(f"Failed to connect to database: {str(e)}")
+                raise
+            try:
+                cursor.execute(query)
+            except Exception as e:
+                print("Exception: ", str(e))
+                logger.error(f"Failed to execute query: {str(e)}")
+                raise
             
             if query.strip().upper().startswith(('SELECT', 'PRAGMA')):
                 results = cursor.fetchall()
@@ -116,7 +125,7 @@ class SQLTool:
                 
                 for row in results:
                     formatted_results.append(" | ".join(str(value) for value in row))
-                
+                print("formatted_results: ", formatted_results)
                 return "\n".join(formatted_results)
             else:
                 conn.commit()
@@ -130,13 +139,16 @@ class SQLTool:
         """Process a natural language request and return the SQL query results."""
         try:
             # Generate the SQL query
+            print("Generating SQL query")
             sql_query = self.sql_chain.invoke(request)
+            print("sql_query: ", sql_query)
             
             # Clean up the SQL query (remove any markdown code blocks if present)
             if "```sql" in sql_query:
                 sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
             elif "```" in sql_query:
                 sql_query = sql_query.split("```")[1].strip()
+            sql_query = sql_query.replace("SQLQuery:", "")
             
             # Execute the query
             result = self.execute_query(sql_query)
@@ -148,9 +160,13 @@ class SQLTool:
             if "cancelled" in request.lower() or "cancel" in request.lower():
                 response += "\n\nNote: Please confirm the cancellation details above. " \
                           "Refund will be processed as per the airline's cancellation policy."
+            print(type(response))
+            print(response)
             return response
             
         except Exception as e:
+            print("Exception: ", str(e))
+            logger.error(f"Failed to process request: {str(e)}")
             return f"Error processing request: {str(e)}"
 
 def get_sql_tool() -> Dict[str, Any]:

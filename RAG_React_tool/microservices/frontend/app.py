@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 # Configuration
 import os
-AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/chat")
+AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/react-agent")
 
 async def query_agent(question: str) -> str:
     """Send query to the agent service and return the response."""
@@ -17,8 +17,17 @@ async def query_agent(question: str) -> str:
                 headers={"Content-Type": "application/json"}
             )
             response.raise_for_status()
-            result = response.json()
-            return result.get("answer", "No answer received")
+        
+            #return response
+            try:
+                print(type(response))
+                print(response.text)
+                result = response.json()                
+                return result.get("answer", response.text)
+            except ValueError:
+                print("ValueError: ", response.text)
+                return response.text
+            
     except Exception as e:
         return f"Error querying agent service: {str(e)}"
 

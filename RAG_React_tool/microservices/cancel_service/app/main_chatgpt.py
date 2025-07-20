@@ -21,6 +21,7 @@ class QueryInput(BaseModel):
 
 @app.post("/query")
 async def sql_tool_query(input: QueryInput):
+    print("inside SQL Tool Query")
     try:
         response = sql_tool_func(input.question)
         return {"response": response}
@@ -29,4 +30,4 @@ async def sql_tool_query(input: QueryInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8003)

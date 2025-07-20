@@ -81,10 +81,10 @@ class RAGPipeline:
     #         logger.error(f"Error formatting documents: {str(e)}")
     #         raise
 
-    def create_rag_chain(self, retriever) -> RunnableSerializable:
+    def create_rag_chain(self) -> RunnableSerializable:
         """Create a RAG (Retrieval-Augmented Generation) chain."""
-        if not retriever:
-            raise ValueError("Retriever must be provided to create RAG chain")
+        # if not retriever:
+        #     raise ValueError("Retriever must be provided to create RAG chain")
 
         try:
             logger.info("Creating RAG chain...")

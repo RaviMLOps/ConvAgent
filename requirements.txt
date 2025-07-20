@@ -9,6 +9,10 @@ sentence-transformers
 faiss-cpu
 gradio
 openai
-dotenv
 #sqlite3
 psycopg2
+fastapi
+uvicorn
+httpx
+pydantic
+python-dotenv

@@ -10,23 +10,27 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 import sys
 
+from dotenv import load_dotenv  
+load_dotenv()
+
 # Add the project root directory to Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-
-
-
 app = FastAPI()
 
 # Service URLs from config map/env vars
-SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8001/query")
+SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8003/query")
 RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
-SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8003/query")
+SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8001/query")
 
 # ---- LangChain ReAct Agent Setup ---- #
-llm = ChatOpenAI(model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4"), temperature=float(os.getenv("OPENAI_TEMPERATURE", "0")), openai_api_key=os.getenv("OPENAI_API_KEY"))
+llm = ChatOpenAI(
+                model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4o"), 
+                temperature=float(os.getenv("OPENAI_TEMPERATURE", "0")), 
+                openai_api_key=os.getenv("OPENAI_API_KEY")
+                )
 
 react_prompt = PromptTemplate.from_template("""
 You are a helpful AI agent that assists users with flight reservations, policies, cancellations, and schedules.
@@ -89,6 +93,7 @@ Begin!
 
 Question: {input}
 {agent_scratchpad}
+
 """)
 
 prompt = react_prompt
@@ -153,11 +158,14 @@ class QueryInput(BaseModel):
 @app.post("/react-agent")
 async def react_agent(input: QueryInput):
     try:
+        print("inside react agent")
         result = await agent_executor.ainvoke({"input": input.question})
+        print("Result_for_react_agent: ", result)
         return {"answer": result.get("output")}
     except Exception as e:
+        print("Exception in react agent: ", str(e))
         return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8004)
