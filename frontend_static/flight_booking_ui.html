@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kohinoor Airlines: Redefining Air Travel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Base Futuristic Colors (Cyan/Purple remain for AI tech feel) */
+      --primary-futuristic: #00bcd4; /* Cyan/Teal - Primary glow */
+      --secondary-futuristic: #673ab7; /* Deep Purple - Accent glow */
+      --primary-futuristic-rgb: 0, 188, 212;
+      --secondary-futuristic-rgb: 103, 58, 183;
+
+      /* Kohinoor/Luxury Theme Colors - MUTED AMETHYST MIXED THEME */
+      --kohinoor-accent: #946CB2; /* Muted Amethyst Purple for light areas */
+      --kohinoor-accent-rgb: 148, 108, 178;
+      --kohinoor-accent-dark: #A580C4; /* Slightly lighter purple for dark areas */
+      --kohinoor-accent-dark-rgb: 165, 128, 196; /* RGB for the darker version */
+      --kohinoor-sapphire: #0d2a5f; /* Base deep blue for dark sections */
+      --kohinoor-sapphire-rgb: 13, 42, 95;
+
+      /* General Theme Colors */
+      --background-body: #f4f4f8; /* Light grey for the main content background */
+      --background-dark: #1a1a2e; /* Dark background for hero, footer, chat */
+      --text-dark: #333; /* Dark text for light backgrounds */
+      --text-light: #f5f5dc; /* Light text for dark backgrounds */
+      --text-accent: var(--kohinoor-accent); /* Accent color for headings/links on light backgrounds */
+      --card-background: #fff; /* White background for info cards and form */
+      --border-accent: rgba(var(--kohinoor-accent-rgb), 0.3); /* Softer border for light theme cards */
+      --shadow-soft: 0 3px 10px rgba(0, 0, 0, 0.1); /* Lighter shadow for cards on light bg */
+      --shadow-glow: 0 0 15px rgba(var(--kohinoor-accent-rgb), 0.3); /* Subtler glow for forms/buttons */
+
+      --chat-color-futuristic: #2196f3; /* Chat icon remains vibrant */
+
+      /* Input field colors */
+      --input-bg: #fff; /* White input background */
+      --input-border: #ddd; /* Light grey input border */
+      --input-focus-border: var(--kohinoor-accent); /* Muted purple on focus */
+      --input-text: #333; /* Dark text in inputs */
+      --button-bg: linear-gradient(45deg, var(--kohinoor-accent), var(--primary-futuristic)); /* Gradient for button */
+      --button-shadow: 0 0 10px rgba(var(--kohinoor-accent-rgb), 0.2); /* Soft shadow for button */
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--background-body); /* Overall light background */
+      color: var(--text-dark); /* Default text color for body */
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.7; /* Slightly reduced line height for a tighter feel */
+      position: relative;
+      /* Removed global background gradients to apply them per section */
+    }
+
+    /* Hero Section (Dark Theme) */
+    .hero {
+      background: linear-gradient(135deg, var(--kohinoor-sapphire) 0%, var(--background-dark) 100%);
+      padding: 80px 20px; /* Adjusted padding */
+      text-align: center;
+      color: var(--text-light); /* Light text on dark hero */
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(var(--kohinoor-accent-dark-rgb), 0.2); /* Subtler border */
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1.2s ease-in-out;
+      border-radius: 0 0 60px 60px; /* Slightly smaller bottom radius */
+    }
+
+    .hero::before, .hero::after {
+      content: '';
+      position: absolute;
+      background: rgba(var(--kohinoor-accent-dark-rgb), 0.08); /* Faint accent on dark hero */
+      border-radius: 50%;
+      filter: blur(20px);
+      opacity: 0.6;
+      animation: floatEffect 15s infinite ease-in-out alternate;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem; /* Reduced font size */
+      margin-bottom: 15px; /* Reduced margin */
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--kohinoor-accent-dark); /* Lighter purple accent on dark background */
+      text-shadow: 0 0 15px rgba(var(--kohinoor-accent-dark-rgb), 0.6), 0 0 20px rgba(var(--primary-futuristic-rgb), 0.4);
+      animation: slideInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .hero p {
+      font-size: 1.2rem; /* Reduced font size */
+      max-width: 700px;
+      margin: 0 auto 30px; /* Reduced margin */
+      line-height: 1.6;
+      opacity: 0.8;
+      animation: fadeInUp 1.3s ease;
+      color: var(--text-light); /* Light text */
+    }
+
+    /* Main Content Sections (Light Theme) */
+    .section {
+      padding: 50px 20px; /* Adjusted padding */
+      text-align: center;
+      position: relative;
+      background: var(--background-body); /* Light background for sections */
+    }
+
+    .section:not(:last-of-type)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      max-width: 800px;
+      border-bottom: 1px dashed rgba(var(--kohinoor-accent-rgb), 0.2); /* Softer separator line */
+    }
+
+    .section h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem; /* Reduced font size */
+      margin-bottom: 20px; /* Reduced margin */
+      color: var(--kohinoor-accent); /* Muted purple accent on light background */
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(var(--kohinoor-accent-rgb), 0.4);
+    }
+
+    .section p {
+      max-width: 800px;
+      margin: 0 auto 40px; /* Adjusted margin */
+      font-size: 1rem; /* Reduced font size */
+      color: var(--text-dark); /* Dark text on light background */
+      opacity: 0.75;
+      line-height: 1.7;
+    }
+
+    .additional-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .info-card {
+      background: var(--card-background); /* White card background */
+      border: 1px solid var(--border-accent); /* Softer border */
+      border-radius: 10px; /* Slightly smaller radius */
+      padding: 20px; /* Reduced padding */
+      text-align: left;
+      box-shadow: var(--shadow-soft); /* Lighter shadow */
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      position: relative;
+    }
+
+    .info-card:hover {
+      transform: translateY(-5px); /* Less dramatic lift */
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 15px rgba(var(--kohinoor-accent-rgb), 0.5);
+      border-color: var(--kohinoor-accent);
+    }
+
+    .info-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--kohinoor-accent); /* Muted purple accent */
+      font-size: 1.3rem; /* Reduced font size */
+      margin-top: 0;
+      margin-bottom: 10px; /* Reduced margin */
+      text-shadow: 0 0 5px rgba(var(--kohinoor-accent-rgb), 0.2);
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    .info-card ul li {
+      margin-bottom: 5px; /* Reduced margin */
+      padding-left: 20px; /* Reduced padding */
+      position: relative;
+      font-size: 0.9rem; /* Reduced font size */
+      color: var(--text-dark); /* Dark text on light card */
+      opacity: 0.7;
+    }
+
+    .info-card ul li::before {
+      content: '\f058'; /* Checkmark icon */
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: var(--kohinoor-accent); /* Muted purple accent */
+      font-size: 1em;
+      position: absolute;
+      left: 0;
+      top: 0px;
+    }
+
+    /* Flight Booking Form Specifics (Light Theme Card) */
+    .flight-booking-form {
+      max-width: 700px; /* Reduced max-width */
+      margin: 40px auto; /* Reduced margin */
+      background: var(--card-background); /* White card background */
+      border: 1px solid var(--border-accent);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: var(--shadow-glow); /* Subtler glow for form */
+      animation: fadeInUp 1s ease-out;
+      text-align: center;  /* Keep form elements left-aligned within the card */
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjusted minmax */
+      gap: 15px; /* Reduced gap */
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      min-height: 80px; /* Adjusted min-height for tighter layout */
+      justify-content: flex-start;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px; /* Reduced margin */
+      font-size: 0.9rem; /* Reduced font size */
+      color: var(--kohinoor-accent); /* Muted purple accent */
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      line-height: 1.1;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: calc(100% - 20px); /* Adjusted width to account for padding */
+      padding: 10px; /* Reduced padding */
+      border: 1px solid var(--input-border); /* Lighter border */
+      border-radius: 6px; /* Slightly smaller border-radius */
+      background-color: var(--input-bg); /* White background */
+      color: var(--input-text); /* Dark text */
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem; /* Reduced font size */
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      /* Updated SVG for select arrow to be darker */
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2C69.2l-20.1-20.1L146.2%2C252.8L49.5%2C156.1l-20.1%2C20.1L146.2%2C293.2L287%2C69.2z%22%2F%3E%3C%2Fsvg%3E');
+      background-repeat: no-repeat;
+      background-position: right 8px center; /* Adjusted position */
+      background-size: 10px auto; /* Smaller arrow */
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--input-focus-border); /* Muted purple on focus */
+      box-shadow: 0 0 8px rgba(var(--kohinoor-accent-rgb), 0.5); /* Softer glow */
+    }
+
+    /* Adjust select options for both themes, though browser default styling often overrides */
+    .form-group select option {
+        color: var(--text-dark); /* Dark text for options */
+        background-color: var(--background-body); /* Light background for options */
+    }
+    @media (prefers-color-scheme: dark) {
+        .form-group select option {
+            color: var(--text-light); /* Light text for options in dark mode */
+            background-color: var(--background-dark); /* Dark background for options in dark mode */
+        }
+    }
+
+    .search-button {
+      background: linear-gradient(45deg, var(--kohinoor-accent), var(--primary-futuristic)); /* Retain vibrant gradient */
+      color: var(--text-light); /* Light text on button */
+      padding: 10px 25px; /* Reduced padding */
+      border: none;
+      border-radius: 8px; /* Slightly smaller border-radius */
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem; /* Reduced font size */
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--button-shadow); /* Softer shadow */
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .search-button:hover {
+      transform: translateY(-2px); /* Less dramatic lift */
+      box-shadow: 0 0 15px rgba(var(--kohinoor-accent-rgb), 0.6), 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Chat Container (Dark Theme) */
+    #chatContainer {
+      position: fixed;
+      bottom: 80px; /* Adjusted position */
+      right: 20px;
+      width: 700px; /* Reduced width */
+      height: 700px; /* Reduced height */
+      border: 1px solid var(--primary-futuristic);
+      background: var(--background-dark); /* Dark background */
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(var(--primary-futuristic-rgb), 0.5); /* Softer glow */
+      border-radius: 10px; /* Smaller radius */
+      display: none;
+      z-index: 9999;
+      transform: scale(0.9); /* Starts slightly smaller */
+      opacity: 0;
+      transition: all 0.3s ease-out; /* Faster transition */
+    }
+
+    #chatContainer.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    #chatContainer iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: transparent;
+    }
+
+    /* Chat Icon (Remains Vibrant) */
+    .chat-icon {
+      position: fixed;
+      bottom: 20px; /* Adjusted position */
+      right: 20px;
+      background: linear-gradient(45deg, var(--chat-color-futuristic), var(--primary-futuristic));
+      color: white;
+      border-radius: 50%;
+      width: 55px; /* Reduced size */
+      height: 55px; /* Reduced size */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px; /* Reduced font size */
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(33, 150, 243, 0.6), 0 0 25px rgba(var(--primary-futuristic-rgb), 0.4);
+      animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1), neon-glow 1.5s infinite alternate;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-icon:hover {
+      transform: scale(1.1); /* Less dramatic scale */
+      box-shadow: 0 0 20px rgba(33, 150, 243, 0.8), 0 0 30px rgba(var(--primary-futuristic-rgb), 0.6);
+    }
+
+    /* Footer (Dark Theme) */
+    .footer {
+      background-color: var(--background-dark); /* Dark background */
+      color: var(--text-light); /* Light text */
+      padding: 25px 20px; /* Reduced padding */
+      text-align: center;
+      margin-top: auto;
+      font-size: 0.85rem; /* Reduced font size */
+      border-top: 1px solid rgba(var(--kohinoor-accent-dark-rgb), 0.1); /* Subtler border */
+      box-shadow: 0 0 10px rgba(var(--kohinoor-accent-dark-rgb), 0.05);
+      opacity: 0.7;
+    }
+
+    .footer p {
+      margin: 0;
+      opacity: 0.6; /* Slightly less opaque */
+    }
+
+    /* Animations (adjusted for new sizes/colors) */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } /* Adjusted translateY */
+    @keyframes slideInDown { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: translateY(0); } } /* Adjusted translateY */
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } /* Less dramatic pulse */
+    @keyframes floatEffect {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(5px, -5px) rotate(2deg); } /* Reduced movement */
+      50% { transform: translate(0, 10px) rotate(-2deg); } /* Reduced movement */
+      75% { transform: translate(-5px, -5px) rotate(0deg); } /* Reduced movement */
+    }
+    @keyframes neon-glow {
+      from { box-shadow: 0 0 5px var(--chat-color-futuristic), 0 0 10px var(--chat-color-futuristic); }
+      to { box-shadow: 0 0 8px var(--chat-color-futuristic), 0 0 15px var(--chat-color-futuristic), 0 0 20px var(--chat-color-futuristic); } /* Softer glow */
+    }
+    @keyframes grid-fade-in { from { opacity: 0; } to { opacity: 0.3; } }
+    @keyframes pulse-bg { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } } /* Softer pulse */
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { padding: 70px 20px; }
+      .hero h1 { font-size: 2.4rem; }
+      .hero p { font-size: 1rem; }
+      .section { padding: 40px 20px; }
+      .section h2 { font-size: 1.8rem; }
+      .flight-booking-form { padding: 20px; margin: 30px auto; }
+      .form-grid { grid-template-columns: 1fr; }
+      .info-card h3 { font-size: 1.2rem; }
+      .info-card ul li { font-size: 0.85rem; }
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 60px 15px 40px; }
+      .hero h1 { font-size: 2rem; letter-spacing: 1px; }
+      .hero p { font-size: 0.9rem; }
+      .chat-icon { width: 45px; height: 45px; font-size: 22px; bottom: 15px; right: 15px; }
+      #chatContainer { width: 90%; height: 70%; right: 5%; left: 5%; bottom: 70px; }
+      .flight-booking-form { padding: 15px; }
+      .search-button { font-size: 0.9rem; padding: 8px 20px; }
+      .section { padding: 30px 15px; }
+      .section h2 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Kohinoor Airlines: Redefining Air Travel ✈️</h1>
+    <p>Experience unparalleled luxury and cutting-edge AI technology with **Kohinoor Airlines**. Elevating your journey to a new standard of excellence.</p>
+  </div>
+
+  <div class="section">
+    <h2>Plan Your Exclusive Flight</h2>
+    <p>Enter your travel details below to access a premium flight experience, meticulously crafted by our advanced AI.</p>
+
+    <div class="flight-booking-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="origin">Departing From</label>
+          <input type="text" id="origin" placeholder="e.g., Chennai (MAA)" required>
+        </div>
+        <div class="form-group">
+          <label for="destination">Arriving At</label>
+          <input type="text" id="destination" placeholder="e.g., London (LHR)" required>
+        </div>
+        <div class="form-group">
+          <label for="departureDate">Departure Date</label>
+          <input type="date" id="departureDate" required>
+        </div>
+        <div class="form-group">
+          <label for="returnDate">Return Date (Optional)</label>
+          <input type="date" id="returnDate">
+        </div>
+        <div class="form-group">
+          <label for="passengers">Passengers</label>
+          <select id="passengers">
+            <option value="1">1 Passenger</option>
+            <option value="2">2 Passengers</option>
+            <option value="3">3 Passengers</option>
+            <option value="4">4 Passengers</option>
+            <option value="5">5+ Passengers</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="travelClass">Service Class</label>
+          <select id="travelClass">
+            <option value="economy">Economy</option>
+            <option value="premium_economy">Premium Economy</option>
+            <option value="business">Business Class</option>
+            <option value="first">First Class</option>
+          </select>
+        </div>
+      </div>
+      <button class="search-button">Search Flights <i class="fas fa-plane-departure"></i></button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>The Kohinoor Advantage</h2>
+    <p>At **Kohinoor Airlines**, we merge timeless elegance with cutting-edge artificial intelligence, providing an unparalleled travel experience designed for discerning travelers.</p>
+
+    <div class="additional-info-grid">
+      <div class="info-card">
+        <h3>AI Concierge for Seamless Booking</h3>
+        <p>Our intelligent AI concierge offers personalized recommendations, real-time fare insights, and effortless, secure booking, fitting your journey like a glove.</p>
+        <ul>
+            <li>Curated flight options</li>
+            <li>Instant booking confirmation</li>
+            <li>Dedicated itinerary management</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>Elevated In-Flight Experience</h3>
+        <p>From gourmet dining to bespoke entertainment, enjoy a journey crafted for your comfort and pleasure, managed proactively by our AI systems.</p>
+        <ul>
+            <li>Personalized entertainment selections</li>
+            <li>Pre-order gourmet meals</li>
+            <li>Seamless cabin climate control</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>24/7 Global AI Assistance</h3>
+        <p>Our round-the-clock AI support ensures you're always connected, from pre-flight queries to on-arrival assistance, making every moment brilliant.</p>
+        <ul>
+            <li>Instant travel advisories</li>
+            <li>Multilingual support</li>
+            <li>Real-time connection guidance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Why Choose Kohinoor Airlines?</h2>
+    <p>
+      **Kohinoor Airlines** redefines air travel. Our AI-powered platform ensures every aspect, from your departure to your graceful arrival, is handled with precision and luxury. Just command and ascend!
+    </p>
+  </div>
+
+  <div id="chatContainer">
+    <iframe id="gradioFrame" src="http://13.200.143.143:7860" title="AI Chat Assistant"></iframe>
+  </div>
+
+  <div class="chat-icon" onclick="toggleChat()" title="Open AI Travel Assistant">
+    💬
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 Kohinoor Airlines. All rights reserved. Precision in Every Journey.</p>
+  </footer>
+
+  <script>
+    function toggleChat() {
+        const container = document.getElementById('chatContainer');
+        const isVisible = container.classList.contains('show');
+
+        if (isVisible) {
+            container.classList.remove('show');
+            setTimeout(() => {
+                container.style.display = "none";
+            }, 400);
+        } else {
+            container.style.display = "block";
+            setTimeout(() => {
+                container.classList.add('show');
+            }, 10);
+        }
+    }
+  </script>
+</body>
+</html>
