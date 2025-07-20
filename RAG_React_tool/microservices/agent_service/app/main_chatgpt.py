@@ -123,7 +123,7 @@ tools = [
         name="CancelTool",
         func=sql_tool_fn,
         coroutine=sql_tool_fn,
-        description="Useful for flight reservation queries like bookings, cancellations, status, and refunds."
+        description="Useful for flight reservation queries like bookings, cancellations, booking status, and refunds."
     ),
     Tool(
         name="PolicyTool",
@@ -135,7 +135,7 @@ tools = [
         name="ScheduleTool",
         func=schedule_tool_fn,
         coroutine=schedule_tool_fn,
-        description="""Useful for checking flight schedules, availability, and timings. 
+        description="""Useful for checking flight schedules, flight status availability, and timings. 
         Example inputs: 
         - 'Show flights from Delhi to Mumbai'
         - 'What are the available flights from Bangalore to Delhi tomorrow?'

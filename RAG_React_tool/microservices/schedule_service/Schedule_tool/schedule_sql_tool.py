@@ -52,11 +52,18 @@ class ScheduleSQLTool:
         Pay attention to use only the column names you can see in the tables below. 
         Be careful not to query for columns that do not exist. Also, pay attention to which column is in which table.
         Do not return any new columns nor perform aggregation on columns unless specifically asked.
-        In case of cancellation query , first step is to confirm with user that the PNR_Number is correct and share information about cancellation policy and refund amount.this should be first response. 
-        After confirmation , second step is to update the Flight_reservation table setting Booking_Status to "Cancelled" and Refund_Status to "Refunded" for the specified PNR_Number.
+        
+        The column_names in the "Flight_availability_and_schedule" are "Flight_ID",	"Airline",
+        "From_airport",	"To_airport", "Departure_Time", "Flight_duration", "Arrival_Time", "From_city",
+        "To_city", "From_airport_code", "To_airport_code", "From_country", "To_country", 
+        "Departure_days_of_week", "Status", "Delay", "available_seats", "total_seats", 
+        "seat_availability_status", "price"
 
-        The database contains flight reservation data, and the PNR_Number column is used to identify reservations.
-        Always verify the PNR_Number before making any updates.
+        Pay attention to use only the column names you can see in the "Flight_availability_and_schedule" table. 
+
+        Be careful not to query for columns that do not exist. Also, pay attention to which column is in which table.
+        Do not return any new columns nor perform aggregation on columns unless specifically asked.
+
 
         Use the following format:
 
@@ -115,10 +122,15 @@ class ScheduleSQLTool:
             sql_query = self.schedule_sql_chain.invoke(request)
 
             # Clean up the SQL query (remove any markdown code blocks if present)
-            if "```sql" in sql_query:
-                sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
-            elif "```" in sql_query:
-                sql_query = sql_query.split("```")[1].strip()
+            # if "```sql" in sql_query:
+            #     sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
+            # elif "```" in sql_query:
+            #     sql_query = sql_query.split("```")[1].strip()
+            for x in ['SQLQuery:', "```sql", "```"]:
+                if x in sql_query:
+                    sql_query = sql_query.replace(x, '') 
+                else:
+                    sql_query 
 
             # Execute the query
             result = self.execute_query(sql_query)

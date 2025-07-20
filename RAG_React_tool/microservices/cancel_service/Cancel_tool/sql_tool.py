@@ -116,12 +116,17 @@ class SQLTool:
         try:
             # Generate the SQL query
             sql_query = self.sql_chain.invoke(request)
+            for x in ['SQLQuery:', "```sql", "```"]:
+                if x in sql_query:
+                    sql_query = sql_query.replace(x, '') 
+                else:
+                    sql_query 
 
             # Clean up the SQL query (remove any markdown code blocks if present)
-            if "```sql" in sql_query:
-                sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
-            elif "```" in sql_query:
-                sql_query = sql_query.split("```")[1].strip()
+            # if "```sql" in sql_query:
+            #     sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
+            # elif "```" in sql_query:
+            #     sql_query = sql_query.split("```")[1].strip()
 
             # Execute the query
             result = self.execute_query(sql_query)
