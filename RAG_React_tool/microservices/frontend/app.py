@@ -3,6 +3,9 @@ import httpx
 import asyncio
 from typing import List, Tuple
 
+from dotenv import load_dotenv  
+load_dotenv()
+
 # Configuration
 import os
 AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/react-agent")

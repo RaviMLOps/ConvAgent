@@ -5,6 +5,9 @@ import os
 import requests
 from typing import List, Dict, Any
 
+from dotenv import load_dotenv  
+load_dotenv()
+
 # Add project root to Python path (go up three levels from current file)
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 if project_root not in sys.path:
@@ -36,12 +39,15 @@ def query_chroma_server(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
     Query the ChromaDB server for relevant document chunks
     """
     try:
+        print("Query to rag service: ", query)
+        print("CHROMA_QUERY_ENDPOINT: ", CHROMA_QUERY_ENDPOINT)
         response = requests.get(
             CHROMA_QUERY_ENDPOINT,
             params={"q": query, "top_k": top_k}
         )
         response.raise_for_status()
-        return response.json().get("results", [])
+        #print("response for chromadb: ", response.json())
+        return response.json().get("answer", [])
     except requests.RequestException as e:
         print(f"Error querying ChromaDB server: {str(e)}")
         return []
@@ -79,21 +85,22 @@ async def rag_tool_search(input: QueryInput):
             return {"response": "No relevant information found in the knowledge base."}
 
         # 2. Format the context from chunks
-        context = "\n\n".join([chunk.get("text", "") for chunk in chunks])
-
+        #context = "\n\n".join([chunk.get("text", "") for chunk in chunks])
+        context = "\n\n".join(chunks)
         # 3. Generate response using the RAG chain with the retrieved context
         print("Generating response with RAG...")
-
+        print(context)
         result = rag_chain.invoke({
             "question": input.question,
             "context": context
         })
 
         print("✓ Response generated successfully")
-        return {
-            "response": result,
-            "sources": chunks  # Include the source chunks for reference
-        }
+        return result
+        #return {
+        #    "response": result,
+        #    "sources": chunks  # Include the source chunks for reference
+        #}
 
     except Exception as e:
         print(f"Error in rag_tool_search: {str(e)}")

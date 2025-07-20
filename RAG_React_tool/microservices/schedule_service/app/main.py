@@ -2,6 +2,9 @@
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv  
+load_dotenv()
+
 # Add the project root to Python path
 project_root = str(Path(__file__).resolve().parents[4])
 sys.path.append(project_root)

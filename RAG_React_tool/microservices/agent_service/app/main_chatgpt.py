@@ -24,7 +24,7 @@ app = FastAPI()
 SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8003/query")
 RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
 SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8001/query")
-
+BOOKING_TOOL_URL = os.getenv("BOOKING_TOOL_URL","http://localhost:8005/chat")
 # ---- LangChain ReAct Agent Setup ---- #
 llm = ChatOpenAI(
                 model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4o"), 
@@ -111,17 +111,29 @@ async def rag_tool_fn(input: str) -> str:
         return response.json().get("response", "[RAG Tool Error]")
 
 async def schedule_tool_fn(input: str) -> str:
+    print("schedule_tool_fn")
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 SCHEDULE_SERVICE_URL,
                 json={"question": input}
             )
+
             if response.status_code != 200:
                 return f"[Schedule Service Error] {response.text}"
+
             return json.dumps(response.json(), indent=2)
+
     except Exception as e:
         return f"[Schedule Tool Error] {str(e)}"
+    
+async def flight_booking_fn(input: str) -> str:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(BOOKING_TOOL_URL, json={"question": input})
+        print("final response: ", response.json())
+        #print(response.json().get("response", "[Booking Tool Error]"))
+        return response.json().get("response", "[Booking Tool Error]")
+        
 
 # Tools wrapped in LangChain Tool interface
 tools = [
@@ -138,6 +150,12 @@ tools = [
         description="Useful for airline policy questions, general queries, and information about baggage, check-in, and other policies."
     ),
     Tool(
+        name="BookingTool",
+        func=flight_booking_fn,
+        coroutine=flight_booking_fn,
+        description="Useful for flight bookings."
+    ),
+    Tool(
         name="ScheduleTool",
         func=schedule_tool_fn,
         coroutine=schedule_tool_fn,
@@ -149,8 +167,9 @@ tools = [
     )
 ]
 
+
 agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors = True)
 
 class QueryInput(BaseModel):
     question: str
@@ -158,9 +177,9 @@ class QueryInput(BaseModel):
 @app.post("/react-agent")
 async def react_agent(input: QueryInput):
     try:
-        print("inside react agent")
+        print("caling agent service")
         result = await agent_executor.ainvoke({"input": input.question})
-        print("Result_for_react_agent: ", result)
+        print("RRRRRRRRRRresult: ", result)
         return {"answer": result.get("output")}
     except Exception as e:
         print("Exception in react agent: ", str(e))

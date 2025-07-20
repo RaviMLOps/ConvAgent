@@ -21,7 +21,7 @@ class Config:
     DATABASE_DIR = os.path.join(BASE_DIR, "database")
     
     # ChromaDB Server Configuration
-    CHROMA_SERVER_HOST = "13.200.14.155"
+    CHROMA_SERVER_HOST = "13.200.143.143"
     CHROMA_SERVER_PORT = 22
     CHROMA_SERVER_BASE = f"{CHROMA_SERVER_HOST}:{CHROMA_SERVER_PORT}/chroma"
     CHROMA_STATUS_ENDPOINT = f"{CHROMA_SERVER_BASE}/status"
@@ -54,6 +54,7 @@ class Config:
     
     # API Keys (load from environment variables)
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    print("OPENAI_API_KEY: ", OPENAI_API_KEY)
     
     @classmethod
     def setup_directories(cls):
