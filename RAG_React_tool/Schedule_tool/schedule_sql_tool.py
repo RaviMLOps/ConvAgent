@@ -1,13 +1,12 @@
 import os
-import sqlite3
-from typing import Dict, Any, Optional
+import psycopg2
+from typing import Dict, Any, Optional, List, Tuple
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import logging
 import sys
-import os
 
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -32,8 +31,8 @@ class ScheduleSQLTool:
             temperature: Temperature for the model
         """
         # Use provided path or default to the new location in the database directory
-        self.db_path = os.path.abspath(db_path or os.path.join(Config.FLIGHT_AVAILABILITY_DB_DIR, "flight_schedule.db"))
-        logger.info(f"Using database at: {self.db_path}")
+        #self.db_path = os.path.abspath(db_path or os.path.join(Config.FLIGHT_AVAILABILITY_DB_DIR, "flight_schedule.db"))
+        #logger.info(f"Using database at: {self.db_path}")
         
         self.model_name = model_name or Config.MODEL_NAME
         self.temperature = temperature
@@ -53,64 +52,87 @@ class ScheduleSQLTool:
             raise
     
     def _setup_schedule_sql_chain(self):
-        """Set up the SQL generation chain."""
-        # Build prompt
-        template = """You are a SQLite expert specialized in airline reservation systems. Your task is to generate syntactically correct SQLite queries based on the user’s natural language request.
+        """Set up the SQL generation chain with conversation context."""
+        template = """You are a PostgreSQL expert specialized in airline flight schedules. Analyze the conversation and generate a SQL query based on the latest request.
+        The conversation is in format [speaker]: [message] with most recent messages last.
 
-        ### General Guidelines:
-        - **Never** select all columns (`SELECT *`). Always select only the columns needed to answer the question.
-        - **Always wrap** column names in double quotes (`"column_name"`).
-        - Use **only the column names and tables explicitly provided**—do not guess.
-        - Avoid using or generating any columns that don't exist.
-        - Do **not perform aggregations (SUM, COUNT, AVG, etc.)** unless specifically asked.
+        ## CONVERSATION:
+        {conversation}
 
-        ### Flight Schedule Queries:
-        If the request is related to **flight schedule**:
-        - **First**, confirm with the user whether the provided **Flight ID (flight number)** is correct.
-        - Then, respond with the **airline's schedule policy** and **refund amount**.
-        - You must **not** write or return a query for flight schedule if no valid Flight ID is provided.
-        - Do **not** attempt to extract schedules based on origin/destination or date — schedules are accessible **only via Flight ID**.
+        ## RULES:
+        1. For flight-specific information (schedule, status, etc.), Flight ID is required in the WHERE clause
+        2. For general flight availability (e.g., flights between cities), use From_city and To_city in WHERE clause
+        3. Always use the table name "Flight_availability_and_schedule" in your queries (lowercase)
+        4. Available columns: Flight_ID, Airline, From_airport, To_airport, Departure_Time, 
+           Flight_duration, Arrival_Time, From_city, To_city, From_airport_code, 
+           To_airport_code, From_country, To_country, Departure_days_of_week, 
+           Status, Delay, available_seats, total_seats, seat_availability_status, price
+        5. Only generate queries for the most recent request in context
 
-        Use the following format:
-        
-        Request: Request here
-        SQLQuery: Generated SQL Query here
-    
-        Request: {Request}
+        ## EXAMPLE 1: Flight by ID
+        Conversation:
+        User: What's the schedule for flight AI101?
+        SQLQuery: SELECT * FROM "Flight_availability_and_schedule" WHERE "Flight_ID" = 'AI101';
+
+        ## EXAMPLE 2: Flight status
+        Conversation:
+        User: Is flight AI101 on time?
+        SQLQuery: SELECT "Flight_ID", "Status", "Departure_Time", "Arrival_Time", "Delay"
+                  FROM "Flight_availability_and_schedule" 
+                  WHERE "Flight_ID" = 'AI101';
+
+        ## EXAMPLE 3: Flights between cities
+        Conversation:
+        User: Show flights from Mumbai to Delhi
+        SQLQuery: SELECT "Flight_ID", "Airline", "Departure_Time", "Arrival_Time", "available_seats", "price"
+                  FROM "Flight_availability_and_schedule"
+                  WHERE "From_city" = 'Mumbai' AND "To_city" = 'Delhi';
+
+        ## EXAMPLE 4: Available flights with seat count
+        Conversation:
+        User: What flights are available from Bangalore to Delhi tomorrow?
+        SQLQuery: SELECT "Flight_ID", "Airline", "Departure_Time", "Arrival_Time", "available_seats", "price"
+                  FROM "Flight_availability_and_schedule"
+                  WHERE "From_city" = 'Bangalore' 
+                    AND "To_city" = 'Delhi'
+                    AND "available_seats" > 0;
+
+        Conversation:
+        {conversation}
         SQLQuery:
         """
         
-        prompt = PromptTemplate(input_variables=["Request"], template=template)
+        prompt = PromptTemplate(input_variables=["conversation"], template=template)
         
         # Create the SQL generation chain
         return (
-            {"Request": RunnablePassthrough()}
+            {"conversation": RunnablePassthrough()}
             | prompt
             | self.llm
             | StrOutputParser()
         )
     
     def execute_query(self, query: str) -> str:
-        """Execute a SQL query and return the results."""
+        """Execute a PostgreSQL query and return the results."""
         try:
             conn = psycopg2.connect(
-                dbname = Config.pg_dbname_2,
-                user = Config.pg_user,
-                password = Config.pg_password,
-                host = Config.pg_host,
-                port = Config.pg_port,
-                )
+                dbname=Config.pg_dbname,
+                user=Config.pg_user,
+                password=Config.pg_password,
+                host=Config.pg_host,
+                port=Config.pg_port
+            )
             cursor = conn.cursor()
             cursor.execute(query)
             
-            if query.strip().upper().startswith(('SELECT', 'PRAGMA')):
+            if query.strip().upper().startswith(('SELECT', 'WITH', 'SHOW', 'DESCRIBE', 'PRAGMA')):
                 results = cursor.fetchall()
-                columns = [description[0] for description in cursor.description] if cursor.description else []
-                conn.close()
+                columns = [desc[0] for desc in cursor.description] if cursor.description else []
                 
                 if not results:
-                    return "No results found."
-                    
+                    conn.close()
+                    return "No matching flight schedule found."
+                
                 # Format the results as a table
                 formatted_results = []
                 if columns:
@@ -118,39 +140,71 @@ class ScheduleSQLTool:
                     formatted_results.append("-" * (sum(len(str(col)) for col in columns) + 3 * (len(columns) - 1)))
                 
                 for row in results:
-                    formatted_results.append(" | ".join(str(value) for value in row))
+                    formatted_results.append(" | ".join(str(value) if value is not None else 'N/A' for value in row))
                 
+                conn.close()
                 return "\n".join(formatted_results)
             else:
                 conn.commit()
+                affected = cursor.rowcount
                 conn.close()
-                return "Query executed successfully."
+                return f"Flight schedule updated successfully. Rows affected: {affected}"
                 
-        except sqlite3.Error as e:
-            return f"Error executing query: {str(e)}"
+        except psycopg2.Error as e:
+            error_msg = str(e).strip()
+            if "duplicate key" in error_msg.lower():
+                return "ERROR: This flight schedule already exists."
+            elif "violates foreign key" in error_msg.lower():
+                return "ERROR: Invalid reference. Please check the Flight ID and other references."
+            elif "does not exist" in error_msg.lower():
+                return "ERROR: The requested flight schedule does not exist."
+            return f"Database Error: {error_msg}"
+        except Exception as e:
+            return f"Error processing flight schedule: {str(e)}"
     
-    def __call__(self, request: str) -> str:
-        """Process a natural language request and return the SQL query results."""
+    def __call__(self, request: str, conversation_history: list = None) -> str:
+        """Process a conversation and return the SQL query results.
+        
+        Args:
+            request: The current user request
+            conversation_history: List of previous messages in format [{"role": "user"|"assistant", "content": str}]
+        """
         try:
-            # Generate the SQL query
-            sql_query = self.schedule_sql_chain.invoke(request)
+            # Format conversation history for the prompt
+            formatted_conversation = []
+            if conversation_history:
+                for msg in conversation_history:
+                    role = "User" if msg['role'] == 'user' else "Assistant"
+                    formatted_conversation.append(f"{role}: {msg['content']}")
             
-            # Clean up the SQL query (remove any markdown code blocks if present)
+            # Add current request to the conversation
+            formatted_conversation.append(f"User: {request}")
+            conversation_text = "\n".join(formatted_conversation)
+            
+            # Generate the SQL query with conversation context
+            sql_query = self.schedule_sql_chain.invoke(conversation_text)
+            
+            # Clean up the SQL query
             if "```sql" in sql_query:
                 sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
             elif "```" in sql_query:
                 sql_query = sql_query.split("```")[1].strip()
+            sql_query = sql_query.replace("SQLQuery:", "").strip()
+            
+            # Check for error message
+            if sql_query.strip().startswith("ERROR:"):
+                return sql_query.strip()
+                
+            # Additional safety check - only require Flight_ID for specific flight queries
+            if any(term in request.lower() for term in ['status', 'schedule', 'departure', 'arrival', 'time', 'delay']):
+                if "where" in sql_query.lower() and "flight_id" not in sql_query.lower():
+                    return "ERROR: For specific flight information, please provide the Flight ID."
             
             # Execute the query
             result = self.execute_query(sql_query)
             
             # Format the response
             response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
-            
-            # Special handling for cancellation
-            if "cancelled" in request.lower() or "cancel" in request.lower():
-                response += "\n\nNote: Please confirm the cancellation details above. " \
-                          "Refund will be processed as per the airline's cancellation policy."
             
             return response
             

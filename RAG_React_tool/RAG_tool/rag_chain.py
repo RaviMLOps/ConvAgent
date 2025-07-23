@@ -80,32 +80,6 @@ class RAGPipeline:
             logger.error(f"Failed to create prompt template: {str(e)}")
             raise
     
-    # def format_docs(self, docs: List[Union[Document, str]]) -> str:
-    #     """
-    #     Format a list of documents into a single string.
-        
-    #     Args:
-    #         docs: List of documents with page_content attribute or strings
-            
-    #     Returns:
-    #         Concatenated document contents
-            
-    #     Raises:
-    #         ValueError: If documents are not in the expected format
-    #     """
-    #     if not docs:
-    #         logger.warning("No documents provided to format_docs")
-    #         return ""
-            
-    #     try:
-    #         return "\n\n".join(
-    #             doc.page_content if hasattr(doc, 'page_content') else str(doc) 
-    #             for doc in docs
-    #         )
-    #     except Exception as e:
-    #         logger.error(f"Error formatting documents: {str(e)}")
-    #         raise
-    
     def create_rag_chain(self) -> RunnableSerializable:
         """
         Create a RAG (Retrieval-Augmented Generation) chain.

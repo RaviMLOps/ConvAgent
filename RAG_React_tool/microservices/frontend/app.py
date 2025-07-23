@@ -2,34 +2,49 @@ import gradio as gr
 import httpx
 import asyncio
 from typing import List, Tuple
-
-# Configuration
 import os
+
 AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/react-agent")
 
-async def query_agent(question: str) -> str:
-    """Send query to the agent service and return the response."""
+async def query_agent(question: str, conversation_id: str = None) -> dict:
+    """
+    Send query to the agent service and return the response.
+    """
     try:
+        payload = {
+            "question": question,
+            "conversation_id": conversation_id
+        }
+
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 AGENT_SERVICE_URL,
-                json={"question": question},
+                json=payload,
                 headers={"Content-Type": "application/json"}
             )
+            #print("Response from react_agent: ", response)
             response.raise_for_status()
-        
-            #return response
-            try:
-                print(type(response))
-                print(response.text)
-                result = response.json()                
-                return result.get("answer", response.text)
-            except ValueError:
-                print("ValueError: ", response.text)
-                return response.text
-            
+            result = response.json()
+            #result = json.dumps(response)
+            #print("Result from react_agent ", result)
+
+            return {
+                "answer": result.get("answer", "No response from agent"),
+                "conversation_id": result.get("conversation_id"),
+                "status": "success"
+            }
+    except httpx.HTTPStatusError as e:
+        return {
+            "status": "error",
+            "error": f"HTTP error occurred: {str(e)}",
+            "answer": "I'm having trouble connecting to the agent service. Please try again later."
+        }
     except Exception as e:
-        return f"Error querying agent service: {str(e)}"
+        return {
+            "status": "error",
+            "error": f"An error occurred: {str(e)}",
+            "answer": "I encountered an unexpected error. Please try again."
+        }
 
 def create_interface():
     with gr.Blocks(title="Flight Assistant") as demo:
@@ -39,25 +54,27 @@ def create_interface():
         """)
 
         chatbot = gr.Chatbot(label="Conversation")
-        state = gr.State(value=[])  # will hold List[Tuple[str, str]]
-
-        msg = gr.Textbox(
-            placeholder="Type your question here and press Enter...",
-            show_label=False
-        )
+        state = gr.State(value=[])
+        msg = gr.Textbox(placeholder="Type your question here and press Enter...", show_label=False)
         clear = gr.Button("Clear Conversation")
+        conversation_id = gr.State(value=None)
 
-        # async handler so we can await query_agent()
-        async def respond(message: str, chat_history: List[Tuple[str, str]]):
+        async def respond(message: str, chat_history: List[Tuple[str, str]], current_conversation_id: str):
             if not message.strip():
-                return "", chat_history, chat_history  # no-op
+                return "", chat_history, current_conversation_id, chat_history
 
-            bot_reply = await query_agent(message)
-            updated_history = chat_history + [(message, bot_reply)]
-            return "", updated_history, updated_history
+            response = await query_agent(
+                question=message,
+                conversation_id=current_conversation_id
+            )
 
-        msg.submit(respond, [msg, state], [msg, chatbot, state])
-        clear.click(lambda: ([], []), None, [chatbot, state], queue=False)
+            new_conversation_id = response.get('conversation_id', current_conversation_id)
+            bot_reply = response.get('answer', 'I apologize, but I encountered an error processing your request.')
+
+            return "", [(message, bot_reply)], new_conversation_id, [(message, bot_reply)]
+
+        msg.submit(respond, [msg, state, conversation_id], [msg, chatbot, conversation_id, state])
+        clear.click(lambda: ([], [], None), None, [chatbot, state, conversation_id], queue=False)
 
     return demo
 
