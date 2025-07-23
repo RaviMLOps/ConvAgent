@@ -40,6 +40,7 @@ conversation_store = {}
 SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8003/query")
 RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
 SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8001/query")
+BOOKING_SERVICE_URL = os.getenv("BOOKING_SERVICE_URL", "http://localhost:8005/query")
 
 # ---- LangChain ReAct Agent Setup ---- #
 llm = ChatOpenAI(
@@ -217,6 +218,25 @@ async def schedule_tool_fn(input: str, conversation_history: list = None) -> str
     except Exception as e:
         return f"[Schedule Tool Error] {str(e)}"
 
+async def booking_tool_fn(input: str, conversation_history: list = None) -> str:
+    """Handle flight booking queries with conversation context"""
+    try:
+        payload = {
+            "question": input,
+            "conversation_history": conversation_history or []
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                BOOKING_SERVICE_URL,
+                json=payload
+            )
+            if response.status_code != 200:
+                return f"[Booking Service Error] {response.text}"
+            return json.dumps(response.json(), indent=2)
+    except Exception as e:
+        return f"[Booking Tool Error] {str(e)}"
+
+
 def create_tool_callable(tool_fn):
     """Create a callable that passes conversation history to the tool function"""
     async def wrapper(input_str: str, **kwargs) -> str:
@@ -265,6 +285,16 @@ tools = [
             "- 'Show flights from Delhi to Mumbai'\n"
             "- 'What are the available flights from Bangalore to Delhi tomorrow?'\n"
             "- 'Is there a morning flight from Mumbai to Delhi?'"
+    ),
+    Tool(
+        name="BookingTool",
+        func=create_tool_callable(booking_tool_fn),
+        coroutine=booking_tool_fn,  # The coroutine will be called directly with conversation_history
+        description=
+            "Useful for flight reservation for customers who need to book the tickets. "
+            "It can be used to:\n"
+            "- Book flights\n"
+            "- View booking status\n"
     )
 ]
 
@@ -318,7 +348,6 @@ agent_executor = AgentExecutor(
     memory_key="chat_history",
     include_run_info=True
 )
-
 
 class Message(BaseModel):
     role: str  # 'user' or 'assistant'
