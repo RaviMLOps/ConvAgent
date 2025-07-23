@@ -9,7 +9,7 @@ from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 import sys
-
+import psycopg2
 from dotenv import load_dotenv  
 load_dotenv()
 

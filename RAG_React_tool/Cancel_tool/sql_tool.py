@@ -144,15 +144,19 @@ class SQLTool:
             
             
             # Clean up the SQL query (remove any markdown code blocks if present)
-            if "```sql" in sql_query:
-                sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
-            elif "```" in sql_query:
-                sql_query = sql_query.split("```")[1].strip()
-            sql_query = sql_query.replace("SQLQuery:", "")
-            ind = sql_query.find("SELECT")
-            sql_query = sql_query[ind::]
+            for x in ['SQLQuery:', "```sql", "```"]:
+                if x in sql_query:
+                    sql_query = sql_query.replace(x, '') 
+                else:
+                    sql_query 
+
             print("sql_query: ", sql_query)
+            
+            # ind = sql_query.find("SELECT")
+            # sql_query = sql_query[ind::]
+            # print("sql_query: ", sql_query)
             # Execute the query
+            
             result = self.execute_query(sql_query)
             
             # Format the response

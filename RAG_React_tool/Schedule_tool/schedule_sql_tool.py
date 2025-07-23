@@ -8,7 +8,7 @@ from langchain_core.runnables import RunnablePassthrough
 import logging
 import sys
 import os
-
+import psycopg2
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
@@ -94,7 +94,7 @@ class ScheduleSQLTool:
         """Execute a SQL query and return the results."""
         try:
             conn = psycopg2.connect(
-                dbname = Config.pg_dbname_2,
+                dbname = Config.pg_dbname,
                 user = Config.pg_user,
                 password = Config.pg_password,
                 host = Config.pg_host,
@@ -141,6 +141,10 @@ class ScheduleSQLTool:
             elif "```" in sql_query:
                 sql_query = sql_query.split("```")[1].strip()
             
+            sql_query = sql_query.replace("SQLQuery:", "")
+            ind = sql_query.find("SELECT")
+            sql_query = sql_query[ind::]
+            print("sql_query: ", sql_query)
             # Execute the query
             result = self.execute_query(sql_query)
             
