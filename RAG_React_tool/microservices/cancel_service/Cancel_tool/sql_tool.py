@@ -133,6 +133,8 @@ class SQLTool:
             result = self.execute_query(sql_query)
 
             # Format the response
+            #response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
+            sql_query = sql_query.replace('\n', ' ')
             response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
            
             # Special handling for cancellation

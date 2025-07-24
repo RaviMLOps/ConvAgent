@@ -54,7 +54,6 @@ class Config:
     
     # API Keys (load from environment variables)
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    print("OPENAI_API_KEY: ", OPENAI_API_KEY)
     
     @classmethod
     def setup_directories(cls):

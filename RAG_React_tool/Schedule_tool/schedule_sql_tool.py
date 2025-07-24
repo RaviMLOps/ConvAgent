@@ -9,6 +9,8 @@ import logging
 import sys
 import os
 
+import psycopg2
+
 # Add the project root to the Python path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
@@ -17,7 +19,11 @@ if project_root not in sys.path:
 from config import Config
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s() - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger(__name__)
 
 class ScheduleSQLTool:
@@ -94,7 +100,7 @@ class ScheduleSQLTool:
         """Execute a SQL query and return the results."""
         try:
             conn = psycopg2.connect(
-                dbname = Config.pg_dbname_2,
+                dbname = Config.pg_dbname,
                 user = Config.pg_user,
                 password = Config.pg_password,
                 host = Config.pg_host,

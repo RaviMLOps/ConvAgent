@@ -1,6 +1,7 @@
 # sql-tool/main.py
 import sys
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv  
 load_dotenv()
@@ -23,11 +24,14 @@ class QueryInput(BaseModel):
 @app.post("/query")
 async def schedule_sql_tool_query(input: QueryInput):
     try:
+        print(f"Query: {input.question}")
         response = schedule_sql_tool_func(input.question)
+        print(f"Response: {response}")
         return {"response": response}
     except Exception as e:
+        print(f"Exception: {str(e)}")
         return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('SCHEDULE_SERVICE_PORT')))

@@ -156,14 +156,15 @@ class SQLTool:
             result = self.execute_query(sql_query)
             
             # Format the response
+            sql_query = sql_query.replace('\n', ' ')
             response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
            
             # Special handling for cancellation
             if "cancelled" in request.lower() or "cancel" in request.lower():
                 response += "\n\nNote: Please confirm the cancellation details above. " \
                           "Refund will be processed as per the airline's cancellation policy."
-            print(type(response))
-            print(response)
+            
+            print(f"Response: {response}")
             return response
             
         except Exception as e:

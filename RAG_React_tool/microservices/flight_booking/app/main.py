@@ -3,16 +3,20 @@ from openai import OpenAI
 import json
 import os
 import requests
-from pypdf import PdfReader
+#from pypdf import PdfReader
 import gradio as gr
 
-try:
-    from config import Config
-except ImportError:
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from config import Config
+
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+parent_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
+parent_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
+print(parent_dir)
+sys.path.append(parent_dir)
+from config import Config
 
 load_dotenv(override=True)
 

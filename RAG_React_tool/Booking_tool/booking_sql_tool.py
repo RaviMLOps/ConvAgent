@@ -141,7 +141,7 @@ class SQLTool:
                 for ele in text:
                     if "Customer_Name" in ele:
                         customer_name = str(ele).split('AS')[0]
-                query = f"""SELECT "PNR_Number", "Customer_Name" FROM "Flight_reservation" WHERE "Customer_Name" = {customer_name}"""
+                query = f"""SELECT "PNR_Number" FROM "Flight_reservation" WHERE "PNR_Number"='{PNR_Number_from_python}'; """
                 
                 cursor = conn.cursor()
                 cursor.execute(query)
@@ -175,6 +175,7 @@ class SQLTool:
             #    return "Query executed successfully!"
                 
         except Exception as e:
+            print(str(e))
             return f"Error executing query: {str(e)}"
     
     def __call__(self, request: str) -> str:
@@ -206,8 +207,9 @@ class SQLTool:
             # Execute the query
             result = self.execute_query(sql_query)
             # Format the response
-            #response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
-            response = f"Result:\n{result}"
+            sql_query = sql_query.replace('\n', ' ')
+            response = f"SQL Query: {sql_query}\n\nResult:\n{result}"
+            #response = f"Result:\n{result}"
             print("\nResponse from booking tool: ========================= \n", response, type(response))
             print('from booking sql',type(response))
             return response

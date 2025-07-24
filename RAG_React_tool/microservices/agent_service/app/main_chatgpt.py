@@ -1,4 +1,5 @@
 # react-agent/main.py
+import traceback
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 import httpx
@@ -9,6 +10,14 @@ from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 import sys
+import logging 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s() - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 from dotenv import load_dotenv  
 load_dotenv()
@@ -21,10 +30,10 @@ if project_root not in sys.path:
 app = FastAPI()
 
 # Service URLs from config map/env vars
-SQL_TOOL_URL = os.getenv("SQL_TOOL_URL", "http://localhost:8003/query")
-RAG_TOOL_URL = os.getenv("RAG_TOOL_URL", "http://localhost:8002/search")
-SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL", "http://localhost:8001/query")
-BOOKING_TOOL_URL = os.getenv("BOOKING_TOOL_URL","http://localhost:8005/chat")
+SQL_TOOL_URL = os.getenv("SQL_TOOL_URL").format(PORT=os.getenv('SQL_TOOL_PORT'))
+RAG_TOOL_URL = os.getenv("RAG_TOOL_URL").format(PORT=os.getenv('RAG_TOOL_PORT'))
+SCHEDULE_SERVICE_URL = os.getenv("SCHEDULE_SERVICE_URL").format(PORT=os.getenv('SCHEDULE_SERVICE_PORT'))
+BOOKING_TOOL_URL = os.getenv("BOOKING_TOOL_URL").format(PORT=os.getenv('BOOKING_TOOL_PORT'))
 # ---- LangChain ReAct Agent Setup ---- #
 llm = ChatOpenAI(
                 model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4o"), 
@@ -101,18 +110,21 @@ prompt = react_prompt
 async def sql_tool_fn(input: str) -> str:
     """Handle flight reservation related queries"""
     async with httpx.AsyncClient() as client:
-        response = await client.post(SQL_TOOL_URL, json={"question": input})
+        response = await client.post(SQL_TOOL_URL, json={"question": input}, timeout=30.0)
+        logger.info(f"Response: {response.json()}")
         return response.json().get("response", "[SQL Tool Error]")
 
 async def rag_tool_fn(input: str) -> str:
     """Handle general knowledge and policy queries"""
     async with httpx.AsyncClient() as client:
-        response = await client.post(RAG_TOOL_URL, json={"question": input})
+        response = await client.post(RAG_TOOL_URL, json={"question": input}, timeout=30.0)
+        logger.info(f"Response: {response.json()}")
         return response.json().get("response", "[RAG Tool Error]")
 
 async def schedule_tool_fn(input: str) -> str:
     print("schedule_tool_fn")
     try:
+        print(f"Query: {input}")
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 SCHEDULE_SERVICE_URL,
@@ -121,20 +133,22 @@ async def schedule_tool_fn(input: str) -> str:
 
             if response.status_code != 200:
                 return f"[Schedule Service Error] {response.text}"
-
+            logger.info(f"Response: {response.json()}")
             return json.dumps(response.json(), indent=2)
 
     except Exception as e:
+        print(str(e))
         return f"[Schedule Tool Error] {str(e)}"
     
 async def flight_booking_fn(input: str) -> str:
+    print("flight_booking_fn")
     async with httpx.AsyncClient() as client:
-        response = await client.post(BOOKING_TOOL_URL, json={"question": input})
-        print("final response: ", response.json())
+        print(f"Query: {input}")
+        response = await client.post(BOOKING_TOOL_URL, json={"question": input}, timeout=30.0)
+        logger.info(f"Response: {response.json()}")
         #print(response.json().get("response", "[Booking Tool Error]"))
         return response.json().get("response", "[Booking Tool Error]")
         
-
 # Tools wrapped in LangChain Tool interface
 tools = [
     Tool(
@@ -177,14 +191,16 @@ class QueryInput(BaseModel):
 @app.post("/react-agent")
 async def react_agent(input: QueryInput):
     try:
-        print("caling agent service")
+        print("caling agent service...")
         result = await agent_executor.ainvoke({"input": input.question})
-        print("RRRRRRRRRRresult: ", result)
+        print(f"react_agent result: {result}")
         return {"answer": result.get("output")}
     except Exception as e:
-        print("Exception in react agent: ", str(e))
+        #traceback.print_stack()
+        print(traceback.format_exc())
+        print(f"Exception in react agent: {str(e)}")
         return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8004)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('AGENT_SERVICE_PORT')))

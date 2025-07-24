@@ -8,12 +8,14 @@ load_dotenv()
 
 # Configuration
 import os
-AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8004/react-agent")
+AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL").format(PORT=os.getenv("AGENT_SERVICE_PORT"))
+print(AGENT_SERVICE_URL)
 
 async def query_agent(question: str) -> str:
     """Send query to the agent service and return the response."""
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
+            print(f"Query: {question}")
             response = await client.post(
                 AGENT_SERVICE_URL,
                 json={"question": question},
@@ -23,8 +25,7 @@ async def query_agent(question: str) -> str:
         
             #return response
             try:
-                print(type(response))
-                print(response.text)
+                print(f"Response: {response.text}")
                 result = response.json()                
                 return result.get("answer", response.text)
             except ValueError:

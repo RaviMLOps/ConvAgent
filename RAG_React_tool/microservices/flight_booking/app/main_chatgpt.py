@@ -25,7 +25,11 @@ except ImportError:
     sys.path.append((os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
     from config import Config
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s() - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger(__name__)
 
 try:
@@ -132,18 +136,18 @@ class QueryInput(BaseModel):
 
 @app.post("/chat")
 async def chat(input: QueryInput):
-    print("flight_booking_chat")
+    logger.info("flight_booking_chat")
     messages = [{"role": "system", "content": booking_tool.system_prompt()}] + [{"role": "user", "content": input.question}]
     done = False
     response = booking_tool.openai.chat.completions.create(model=Config.MODEL_NAME, messages=messages, tools=tools)
-    print(response.choices[0].finish_reason)
+    logger.debug(f"response: {response.choices[0].finish_reason}")
         
     if response.choices[0].finish_reason=="tool_calls":
         #print(response)
         message = response.choices[0].message
-        print("message: ", message.content)
+        logger.debug(f"message: {message.content}")
         tool_call = message.tool_calls[0]
-        print("tool_call:", tool_call)
+        logger.debug(f"tool_call: {tool_call}")
         #results = booking_tool.handle_tool_call(tool_calls)
         
         arguments = json.loads(tool_call.function.arguments)
@@ -154,17 +158,20 @@ async def chat(input: QueryInput):
         results = sql_tool_func(message.content)
         messages.append(message)
         messages.extend(results)
-        return results
-        #return {"response": results}
+        logger.debug(f"Response: {results}")
+        #return results
+        return {"response": results}
         
     else:
         done = True
-        print("before final return")
-        print(response.choices[0].message.content)
+        logger.debug("before final return")
+        logger.debug(response.choices[0].message.content)
         #return {"response" : response.choices[0].message.content}
         return {"response" : response.choices[0].message.content}
     
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8005)
+    print("Booking tool started")
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('BOOKING_TOOL_PORT')))
+
 
