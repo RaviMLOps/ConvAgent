@@ -147,6 +147,10 @@ class ScheduleSQLTool:
             elif "```" in sql_query:
                 sql_query = sql_query.split("```")[1].strip()
             
+            sql_query = sql_query.replace("SQLQuery:", "")
+            ind = sql_query.find("SELECT")
+            sql_query = sql_query[ind::]
+            print("sql_query: ", sql_query)
             # Execute the query
             result = self.execute_query(sql_query)
             
