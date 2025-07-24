@@ -177,7 +177,7 @@ class SQLTool:
         except Exception as e:
             return f"Error executing query: {str(e)}"
     
-    def __call__(self, request: str , conversation_history: List[Dict[str, Any]]) -> str:
+    def __call__(self, request: str , conversation_history: list[Dict[str, Any]]) -> str:
         print("This is booking tool - sql tool")
         """Process a natural language request and return the SQL query results."""
         try:
