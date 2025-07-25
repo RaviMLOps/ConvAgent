@@ -36,10 +36,10 @@ except:
 
 app = FastAPI()
 
-def book_flight(**arguments):
-    sql_tool_func = get_booking_sql_tool()["func"]
-    response = sql_tool_func(**arguments)
-    return {"response": response}
+#def book_flight(request):
+#    sql_tool_func = get_booking_sql_tool()["func"]
+#    response = sql_tool_func(request)
+#    return {"response": response}
 
 
 book_flight_json = {
@@ -79,9 +79,10 @@ tools = [{"type": "function", "function": book_flight_json}]
 
 class BookingTool:
     def __init__(self, model_name: str = None, temperature: float = 0.0):
+        self.temperature = temperature
         self.openai= OpenAI(api_key=Config.OPENAI_API_KEY)
              
-
+        
     def system_prompt(self):
         system_prompt = """You are acting as Customer support from an arline company.\
         You are answering questions on flight booking. \
@@ -92,37 +93,42 @@ class BookingTool:
 
         Once you receive all necessary information, please go ahead 
         and book the flight ticket. 
-
+        
         please use the book_flight tool.
-        
-        Example input: 
-            My name is Arjun Deshpande, I need to travel on 4th Sep in SG948 from chennai to Dellhi
-        Answer:
-            I received all necessary information. So I should go ahead and book flight ticket.
-                - Customer_Name : Arjun Deshpande
-                - Travel_Date : 4th September 2025
-                - From_City : Chennai
-                - To_City : Delhi
-                - Flight_ID : sG948
-        
+
         Example input:
             My name is Amarnath. I need to book ticket from Delhi to Pune.
         Answer:
             Travel_Date and Flight_ID are missing. So I should steer the user to provide the same.
+        
+        Example input:
+            Hi This is Arjun Das. Could you help me in booking a ticket to Hyderabad?
+        Answer:
+            Travel_Date, Flight_ID, From_City are missing. So I should steer the user to provide the same.
+            
+        Example input: 
+            My name is Arjun Deshpande, I need to book flight ticket on 4th Sep in SG948 from chennai to Dellhi
+        Answer:
+            I received all necessary information. So I go ahead and book flight ticket.
+                - Customer_Name : Arjun Deshpande
+                - Travel_Date : 4th September 2025
+                - From_City : Chennai
+                - To_City : Delhi
+                - Flight_ID : SG948
+
+            Once I receive PNR, I should send it back to the user.
         """
-
-
         return system_prompt
 
-    def handle_tool_call(self, tool_calls):
-        results = []
-        for tool_call in tool_calls:
-            tool_name = tool_call.function.name
-            arguments = json.loads(tool_call.function.arguments)
-            tool = globals().get(tool_name)
-            result = tool(**arguments) if tool else {}
-            results.append({"role": "tool","content": json.dumps(result),"tool_call_id": tool_call.id})
-        return results
+    #def handle_tool_call(self, tool_calls):
+    #    results = []
+    #    for tool_call in tool_calls:
+    #        tool_name = tool_call.function.name
+    #        arguments = json.loads(tool_call.function.arguments)
+    #        tool = globals().get(tool_name)
+    #        result = tool(**arguments) if tool else {}
+    #        results.append({"role": "tool","content": json.dumps(result),"tool_call_id": tool_call.id})
+    #    return results
 
 booking_tool = BookingTool()
 
@@ -130,35 +136,43 @@ class QueryInput(BaseModel):
     question: str
 
 
-@app.post("/chat")
+@app.post("/query")
 async def chat(input: QueryInput):
     print("flight_booking_chat")
     messages = [{"role": "system", "content": booking_tool.system_prompt()}] + [{"role": "user", "content": input.question}]
-    done = False
+    #done = False
     response = booking_tool.openai.chat.completions.create(model=Config.MODEL_NAME, messages=messages, tools=tools)
+    print(response.choices[0].message)
     print(response.choices[0].finish_reason)
         
     if response.choices[0].finish_reason=="tool_calls":
         #print(response)
         message = response.choices[0].message
         print("message: ", message.content)
+
+        
         tool_call = message.tool_calls[0]
         print("tool_call:", tool_call)
         #results = booking_tool.handle_tool_call(tool_calls)
         
         arguments = json.loads(tool_call.function.arguments)
         print("Arguments\n=======:\n", type(arguments))
-        
+        if message.content is None:
+            message.content = "Please book flight ticket based on " + str(arguments)
         #booking_request = "Please book flight based on " + str(arguments)
-        sql_tool_func = get_sql_tool()["func"]
+        sql_tool_func = get_booking_sql_tool()["func"]
         results = sql_tool_func(message.content)
-        messages.append(message)
-        messages.extend(results)
-        return results
-        #return {"response": results}
+        original_string = response.choices[0].message.content
+        response.choices[0].message.content = response.choices[0].message.content.replace(original_string, results)
+        print("Final response to FE: ", response.choices[0].message)
+        print("Final response to FE: ", response.choices[0].message.content)
+        #messages.append(message)
+        #messages.extend(results)
+        #return results
+        return {"response": response.choices[0].message.content}
         
     else:
-        done = True
+        #done = True
         print("before final return")
         print(response.choices[0].message.content)
         #return {"response" : response.choices[0].message.content}
@@ -167,4 +181,3 @@ async def chat(input: QueryInput):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8005)
-

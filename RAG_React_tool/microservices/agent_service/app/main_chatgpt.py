@@ -228,7 +228,8 @@ async def booking_tool_fn(input: str, conversation_history: list = None) -> str:
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 BOOKING_SERVICE_URL,
-                json=payload
+                json=payload,
+                timeout = 30.0
             )
             if response.status_code != 200:
                 return f"[Booking Service Error] {response.text}"
