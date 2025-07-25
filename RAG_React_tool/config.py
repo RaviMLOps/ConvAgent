@@ -34,7 +34,7 @@ class Config:
     pg_dbname = "Flight_reservation"
     pg_user = "postgres"
     pg_password = "mlcohort@4"
-    pg_host = "13.200.143.143"
+    pg_host = "3.110.60.87"
     pg_port = 5432
     
     # Database paths
