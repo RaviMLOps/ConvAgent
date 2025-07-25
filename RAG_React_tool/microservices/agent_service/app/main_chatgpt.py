@@ -135,18 +135,6 @@ Thought: The booking has been cancelled.
 Final Answer: Your flight with PNR AF1234 has been successfully cancelled. A refund of ₹8,000 will be processed in 5–7 business days.
 """
 
-# We'll use a simple string prompt since initialize_agent will handle the chat format
-## Example: Policy Query ##
-
-# User: What is the baggage allowance for economy class on international flights?
-# Thought: This is a policy-related question that requires checking airline policies.
-# Action: RagTool
-# Action Input: What is the baggage allowance for economy class on international flights?
-# -- tool returns baggage policy --
-# Thought: I have the baggage policy information. I should present it clearly to the user.
-# Final Answer: For international economy class flights, the standard baggage allowance is typically 1 piece of cabin baggage up to 7 kg (15 lbs) with maximum dimensions of 115 cm (45 inches), and 1 piece of check-in baggage up to 23 kg (50 lbs). However, this may vary by airline and route. Would you like me to check the specific policy for your airline?
-
-
 async def sql_tool_fn(input: str, conversation_history: list = None) -> str:
     """Handle flight reservation related queries with conversation context"""
     payload = {
@@ -236,7 +224,7 @@ async def booking_tool_fn(input: str, conversation_history: list = None) -> str:
     except Exception as e:
         return f"[Booking Tool Error] {str(e)}"
 
-
+# Create a callable that passes conversation history to the tool function
 def create_tool_callable(tool_fn):
     """Create a callable that passes conversation history to the tool function"""
     async def wrapper(input_str: str, **kwargs) -> str:
@@ -291,7 +279,7 @@ tools = [
         func=create_tool_callable(booking_tool_fn),
         coroutine=booking_tool_fn,  # The coroutine will be called directly with conversation_history
         description=
-            "Useful for flight reservation for customers who need to book the tickets. "
+            "Useful for flight booking for customers who need to book the tickets. "
             "It can be used to:\n"
             "- Book flights\n"
             "- View booking status\n"
@@ -343,7 +331,7 @@ agent_executor = AgentExecutor(
     tools=tools,
     verbose=True,
     handle_parsing_errors=True,
-    return_intermediate_steps=False,
+    return_intermediate_steps=True,
     max_iterations=5,
     memory_key="chat_history",
     include_run_info=True
@@ -423,14 +411,6 @@ async def react_agent(input: QueryInput):
         print("Chat history for react agent:", chat_history)
         
         # Prepare the input with conversation history for tools
-        # agent_input = {
-        #     "input": input.question,
-        #     "chat_history": chat_history,
-        #     "conversation_history": [
-        #         {"role": msg.role, "content": msg.content}
-        #         for msg in conversation.messages[-10:]  # Last 10 messages for context
-        #     ]
-        # }
 
         agent_input = {
             "input": input.question,
@@ -446,9 +426,9 @@ async def react_agent(input: QueryInput):
         
         print("Agent response:", result)
         print("Agent response type:", type(result))
-        print("Agent response keys:", result.keys())
-        print("Agent response values:", result.values())
-        print("Agent response items:", result.items())
+        # print("Agent response keys:", result.keys())
+        # print("Agent response values:", result.values())
+        # print("Agent response items:", result.items())
         
         # Add assistant's response to conversation
         assistant_response = result.get("output", "I'm sorry, I couldn't process that request.")

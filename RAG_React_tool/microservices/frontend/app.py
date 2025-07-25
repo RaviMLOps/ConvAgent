@@ -81,6 +81,6 @@ def create_interface():
 if __name__ == "__main__":
     demo = create_interface()
     try:
-        demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
+        demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
     except OSError:
-        demo.launch(server_name="0.0.0.0", server_port=0, share=False)
+        demo.launch(server_name="0.0.0.0", server_port=0, share=True)

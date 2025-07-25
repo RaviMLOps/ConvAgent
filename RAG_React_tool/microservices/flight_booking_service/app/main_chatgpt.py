@@ -150,7 +150,7 @@ async def chat(input: QueryInput):
         print("Arguments\n=======:\n", type(arguments))
         
         #booking_request = "Please book flight based on " + str(arguments)
-        sql_tool_func = get_sql_tool()["func"]
+        sql_tool_func = get_booking_sql_tool()["func"]
         results = sql_tool_func(message.content)
         messages.append(message)
         messages.extend(results)
